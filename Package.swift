@@ -26,13 +26,13 @@ let package = Package(
         .library(name: "Tree N Primitives Test Support", targets: ["Tree N Primitives Test Support"]),
     ],
     dependencies: [
-        .package(path: "../swift-tree-primitives"),
-        .package(path: "../swift-buffer-arena-primitives"),
-        .package(path: "../swift-buffer-primitives"),
-        .package(path: "../swift-queue-primitives"),
-        .package(path: "../swift-stack-primitives"),
-        .package(path: "../swift-index-primitives"),
-        .package(path: "../swift-array-primitives"),
+        .package(url: "https://github.com/swift-primitives/swift-tree-primitives.git", branch: "main"),
+        .package(url: "https://github.com/swift-primitives/swift-buffer-arena-primitives.git", branch: "main"),
+        .package(url: "https://github.com/swift-primitives/swift-buffer-primitives.git", branch: "main"),
+        .package(url: "https://github.com/swift-primitives/swift-queue-primitives.git", branch: "main"),
+        .package(url: "https://github.com/swift-primitives/swift-stack-primitives.git", branch: "main"),
+        .package(url: "https://github.com/swift-primitives/swift-index-primitives.git", branch: "main"),
+        .package(url: "https://github.com/swift-primitives/swift-array-primitives.git", branch: "main"),
     ],
     targets: [
 
