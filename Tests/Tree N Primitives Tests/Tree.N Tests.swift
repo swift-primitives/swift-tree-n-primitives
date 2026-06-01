@@ -10,6 +10,7 @@
 // ===----------------------------------------------------------------------===//
 
 import Array_Primitives
+import Sequence_Primitives
 import Synchronization
 import Testing
 import Tree_N_Primitives_Test_Support
@@ -17,15 +18,6 @@ import Tree_N_Primitives_Test_Support
 @testable import Tree_N_Primitives
 
 // MARK: - Test Helpers
-
-/// Collects a sequence of integers into a primitives Array.
-private func collect<S: Swift.Sequence<Int>>(_ sequence: S) -> [Int] {
-    var result = [Int]()
-    for element in sequence {
-        result.append(element)
-    }
-    return result
-}
 
 /// Asserts that a primitives Array contains the expected elements in order.
 private func expectEqual(_ array: borrowing [Int], _ expected: Int...) {
@@ -224,10 +216,10 @@ struct TreeNBinaryTests {
         _ = try tree.insert(4, at: .left(of: left))
         _ = try tree.insert(5, at: .right(of: left))
 
-        expectEqual(collect(tree.preOrder), 1, 2, 4, 5, 3)
-        expectEqual(collect(tree.inOrder), 4, 2, 5, 1, 3)
-        expectEqual(collect(tree.postOrder), 4, 5, 2, 3, 1)
-        expectEqual(collect(tree.levelOrder), 1, 2, 3, 4, 5)
+        expectEqual(tree.preOrder.collect(), 1, 2, 4, 5, 3)
+        expectEqual(tree.inOrder.collect(), 4, 2, 5, 1, 3)
+        expectEqual(tree.postOrder.collect(), 4, 5, 2, 3, 1)
+        expectEqual(tree.levelOrder.collect(), 1, 2, 3, 4, 5)
     }
 
     @Test
@@ -308,8 +300,8 @@ struct TreeNBoundedTests {
         _ = try tree.insert(4, at: .left(of: left))
         _ = try tree.insert(5, at: .right(of: left))
 
-        expectEqual(collect(tree.preOrder), 1, 2, 4, 5, 3)
-        expectEqual(collect(tree.inOrder), 4, 2, 5, 1, 3)
+        expectEqual(tree.preOrder.collect(), 1, 2, 4, 5, 3)
+        expectEqual(tree.inOrder.collect(), 4, 2, 5, 1, 3)
     }
 }
 

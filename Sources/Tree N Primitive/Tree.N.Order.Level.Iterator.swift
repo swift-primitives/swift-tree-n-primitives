@@ -10,50 +10,28 @@
 // ===----------------------------------------------------------------------===//
 
 public import Queue_Primitives
+internal import Iterator_Primitive
+internal import Iterator_Protocol
 
 // MARK: - Level-Order Iterator
 
 extension Tree.N.Order.Level {
 
     /// An iterator for level-order traversal.
-    public struct Iterator: Sequence_Primitives.Sequence.Iterator.`Protocol`, IteratorProtocol {
+    public struct Iterator: Iterator_Primitive.Iterator.`Protocol` {
         @usableFromInline
         let tree: Tree.N<n>
 
         @usableFromInline
         var pending: Queue<Index<Tree.N<n>.Node>>
 
-        @usableFromInline
-        var _element: Element? = nil
-
-        init(tree: Tree.N<n>) {
+        package init(tree: Tree.N<n>) {
             self.tree = tree
             self.pending = Queue<Index<Tree.N<n>.Node>>()
 
             if let rootIndex = tree._rootIndex {
                 pending.enqueue(rootIndex)
             }
-        }
-
-        @_lifetime(&self)
-        @inlinable
-        public mutating func nextSpan(maximumCount: Cardinal) -> Span<Element> {
-            let ptr = unsafe withUnsafeMutablePointer(to: &_element) { p in
-                unsafe UnsafePointer<Element>(
-                    unsafe UnsafeRawPointer(p).assumingMemoryBound(to: Element.self)
-                )
-            }
-            guard maximumCount > .zero else {
-                let span = unsafe Span(_unsafeStart: ptr, count: 0)
-                return unsafe _overrideLifetime(span, mutating: &self)
-            }
-            guard let value = next() else {
-                let span = unsafe Span(_unsafeStart: ptr, count: 0)
-                return unsafe _overrideLifetime(span, mutating: &self)
-            }
-            _element = value
-            let span = unsafe Span(_unsafeStart: ptr, count: 1)
-            return unsafe _overrideLifetime(span, mutating: &self)
         }
 
         @inlinable

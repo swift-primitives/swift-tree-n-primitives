@@ -17,10 +17,6 @@ extension Tree.N.Bounded.Order.In {
     ///
     /// Only available for binary trees (n == 2).
     public struct Sequence {
-        let tree: Tree.N<n>.Bounded
-
-        public func makeIterator() -> Iterator {
-            Iterator(tree: tree)
-        }
+        package let tree: Tree.N<n>.Bounded
     }
 }

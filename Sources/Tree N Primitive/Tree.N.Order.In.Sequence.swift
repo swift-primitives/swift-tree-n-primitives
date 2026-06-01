@@ -18,10 +18,6 @@ extension Tree.N.Order.In {
     /// In-order traversal visits left subtree, then root, then right subtree.
     /// Only available for binary trees (n == 2).
     public struct Sequence {
-        let tree: Tree.N<n>
-
-        public func makeIterator() -> Iterator {
-            Iterator(tree: tree)
-        }
+        package let tree: Tree.N<n>
     }
 }

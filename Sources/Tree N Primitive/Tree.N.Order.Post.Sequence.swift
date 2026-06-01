@@ -17,10 +17,6 @@ extension Tree.N.Order.Post {
     ///
     /// Post-order traversal visits children left-to-right, then the root.
     public struct Sequence {
-        let tree: Tree.N<n>
-
-        public func makeIterator() -> Iterator {
-            Iterator(tree: tree)
-        }
+        package let tree: Tree.N<n>
     }
 }

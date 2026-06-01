@@ -17,10 +17,6 @@ extension Tree.N.Order.Pre {
     ///
     /// Pre-order traversal visits the root first, then children left-to-right.
     public struct Sequence {
-        let tree: Tree.N<n>
-
-        public func makeIterator() -> Iterator {
-            Iterator(tree: tree)
-        }
+        package let tree: Tree.N<n>
     }
 }

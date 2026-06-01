@@ -33,6 +33,8 @@ let package = Package(
         .package(url: "https://github.com/swift-primitives/swift-stack-primitives.git", branch: "main"),
         .package(url: "https://github.com/swift-primitives/swift-index-primitives.git", branch: "main"),
         .package(url: "https://github.com/swift-primitives/swift-array-primitives.git", branch: "main"),
+        .package(url: "https://github.com/swift-primitives/swift-iterator-primitives.git", branch: "main"),
+        .package(url: "https://github.com/swift-primitives/swift-sequence-primitives.git", branch: "main"),
     ],
     targets: [
 
@@ -49,6 +51,8 @@ let package = Package(
                 .product(name: "Index Primitives", package: "swift-index-primitives"),
                 .product(name: "Queue Primitives", package: "swift-queue-primitives"),
                 .product(name: "Stack Primitives", package: "swift-stack-primitives"),
+                .product(name: "Iterator Primitive", package: "swift-iterator-primitives"),
+                .product(name: "Iterator Protocol", package: "swift-iterator-primitives"),
             ]
         ),
         // Bounded capacity variant (fixed upfront allocation). Shares base Tree.N's
@@ -60,6 +64,8 @@ let package = Package(
                 .product(name: "Buffer Arena Primitives", package: "swift-buffer-arena-primitives"),
                 .product(name: "Queue Primitives", package: "swift-queue-primitives"),
                 .product(name: "Stack Primitives", package: "swift-stack-primitives"),
+                .product(name: "Iterator Primitive", package: "swift-iterator-primitives"),
+                .product(name: "Iterator Protocol", package: "swift-iterator-primitives"),
             ]
         ),
         // Inline capacity variant — unconditionally ~Copyable (@_rawLayout inline arena).
@@ -98,11 +104,21 @@ let package = Package(
                 "Tree N Bounded Primitives",
                 "Tree N Inline Primitives",
                 "Tree N Small Primitives",
+                .product(name: "Iterable", package: "swift-iterator-primitives"),
+                .product(name: "Iterator Primitive", package: "swift-iterator-primitives"),
+                .product(name: "Iterator Chunk Primitives", package: "swift-iterator-primitives"),
+                .product(name: "Sequence Protocol Primitives", package: "swift-sequence-primitives"),
             ]
         ),
         .target(
             name: "Tree N Bounded Primitives",
-            dependencies: ["Tree N Bounded Primitive"]
+            dependencies: [
+                "Tree N Bounded Primitive",
+                .product(name: "Iterable", package: "swift-iterator-primitives"),
+                .product(name: "Iterator Primitive", package: "swift-iterator-primitives"),
+                .product(name: "Iterator Chunk Primitives", package: "swift-iterator-primitives"),
+                .product(name: "Sequence Protocol Primitives", package: "swift-sequence-primitives"),
+            ]
         ),
         .target(
             name: "Tree N Inline Primitives",
@@ -131,6 +147,7 @@ let package = Package(
                 "Tree N Primitives Test Support",
                 .product(name: "Array Primitives", package: "swift-array-primitives"),
                 .product(name: "Buffer Primitives", package: "swift-buffer-primitives"),
+                .product(name: "Sequence Primitives", package: "swift-sequence-primitives"),
             ]
         ),
     ],

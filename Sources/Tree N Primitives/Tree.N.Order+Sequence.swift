@@ -10,17 +10,122 @@
 // ===----------------------------------------------------------------------===//
 
 public import Tree_N_Primitive
+public import Iterable
+public import Iterator_Primitive
+public import Iterator_Chunk_Primitives
+public import Sequence_Protocol_Primitives
 
-// MARK: - Swift.Sequence Conformances (isolated per [MOD-004] / [MOD-036])
+// MARK: - Iterable + Sequenceable Conformances (isolated per [MOD-004] / [MOD-036])
 //
-// The `Tree.N.Order.*.Sequence` structs, their `makeIterator()`, and the
-// storage-touching `@inlinable` Order iterators are co-located with the arena
-// storage in the `Tree N Primitive` type module (handoff MUST + [MOD-036]:
-// internal `@usableFromInline` storage + cross-module `@inlinable` would fail).
-// Only the Copyable-imposing `Swift.Sequence` conformance is isolated here so
-// the lean `~Copyable` type surface stays poison-free per [MOD-004].
+// The `Tree.N.Order.*.Sequence` structs and the storage-touching `@inlinable`
+// Order iterators are co-located with the arena storage in the `Tree N Primitive`
+// type module (handoff MUST + [MOD-036]: internal `@usableFromInline` storage +
+// cross-module `@inlinable` would fail). Only the Copyable-imposing iteration
+// conformances are isolated here so the lean `~Copyable` type surface stays
+// poison-free per [MOD-004].
+//
+// Both `Iterable` and `Sequenceable` declare `associatedtype Iterator`, which Swift
+// unifies; the dual conformer splits the two bindings with `@_implements`. The scalar
+// iterator is the sibling `Tree.N.Order.*.Iterator` — referenced fully-qualified
+// (`Tree<Element>.N<n>.Order.*.Iterator`) so the bare name `Iterator` does not resolve
+// to `Self.Iterator` (the associated type being defined).
 
-extension Tree.N.Order.Pre.Sequence: Swift.Sequence {}
-extension Tree.N.Order.Post.Sequence: Swift.Sequence {}
-extension Tree.N.Order.Level.Sequence: Swift.Sequence {}
-extension Tree.N.Order.In.Sequence: Swift.Sequence {}
+// MARK: Pre
+
+extension Tree.N.Order.Pre.Sequence: Iterable where Element: Copyable {
+    @_implements(Iterable, Iterator)
+    public typealias IterableIterator =
+        Iterator_Primitive.Iterator.Materializing<Tree<Element>.N<n>.Order.Pre.Iterator>
+
+    @_lifetime(borrow self)
+    @_implements(Iterable, makeIterator())
+    public borrowing func iterableMakeIterator()
+        -> Iterator_Primitive.Iterator.Materializing<Tree<Element>.N<n>.Order.Pre.Iterator>
+    {
+        Iterator_Primitive.Iterator.Materializing(Tree<Element>.N<n>.Order.Pre.Iterator(tree: tree))
+    }
+}
+
+extension Tree.N.Order.Pre.Sequence: Sequenceable where Element: Copyable {
+    @_implements(Sequenceable, Iterator)
+    public typealias SequenceableIterator = Tree<Element>.N<n>.Order.Pre.Iterator
+
+    public consuming func makeIterator() -> Tree<Element>.N<n>.Order.Pre.Iterator {
+        Tree<Element>.N<n>.Order.Pre.Iterator(tree: tree)
+    }
+}
+
+// MARK: Post
+
+extension Tree.N.Order.Post.Sequence: Iterable where Element: Copyable {
+    @_implements(Iterable, Iterator)
+    public typealias IterableIterator =
+        Iterator_Primitive.Iterator.Materializing<Tree<Element>.N<n>.Order.Post.Iterator>
+
+    @_lifetime(borrow self)
+    @_implements(Iterable, makeIterator())
+    public borrowing func iterableMakeIterator()
+        -> Iterator_Primitive.Iterator.Materializing<Tree<Element>.N<n>.Order.Post.Iterator>
+    {
+        Iterator_Primitive.Iterator.Materializing(Tree<Element>.N<n>.Order.Post.Iterator(tree: tree))
+    }
+}
+
+extension Tree.N.Order.Post.Sequence: Sequenceable where Element: Copyable {
+    @_implements(Sequenceable, Iterator)
+    public typealias SequenceableIterator = Tree<Element>.N<n>.Order.Post.Iterator
+
+    public consuming func makeIterator() -> Tree<Element>.N<n>.Order.Post.Iterator {
+        Tree<Element>.N<n>.Order.Post.Iterator(tree: tree)
+    }
+}
+
+// MARK: Level
+
+extension Tree.N.Order.Level.Sequence: Iterable where Element: Copyable {
+    @_implements(Iterable, Iterator)
+    public typealias IterableIterator =
+        Iterator_Primitive.Iterator.Materializing<Tree<Element>.N<n>.Order.Level.Iterator>
+
+    @_lifetime(borrow self)
+    @_implements(Iterable, makeIterator())
+    public borrowing func iterableMakeIterator()
+        -> Iterator_Primitive.Iterator.Materializing<Tree<Element>.N<n>.Order.Level.Iterator>
+    {
+        Iterator_Primitive.Iterator.Materializing(Tree<Element>.N<n>.Order.Level.Iterator(tree: tree))
+    }
+}
+
+extension Tree.N.Order.Level.Sequence: Sequenceable where Element: Copyable {
+    @_implements(Sequenceable, Iterator)
+    public typealias SequenceableIterator = Tree<Element>.N<n>.Order.Level.Iterator
+
+    public consuming func makeIterator() -> Tree<Element>.N<n>.Order.Level.Iterator {
+        Tree<Element>.N<n>.Order.Level.Iterator(tree: tree)
+    }
+}
+
+// MARK: In
+
+extension Tree.N.Order.In.Sequence: Iterable where Element: Copyable {
+    @_implements(Iterable, Iterator)
+    public typealias IterableIterator =
+        Iterator_Primitive.Iterator.Materializing<Tree<Element>.N<n>.Order.In.Iterator>
+
+    @_lifetime(borrow self)
+    @_implements(Iterable, makeIterator())
+    public borrowing func iterableMakeIterator()
+        -> Iterator_Primitive.Iterator.Materializing<Tree<Element>.N<n>.Order.In.Iterator>
+    {
+        Iterator_Primitive.Iterator.Materializing(Tree<Element>.N<n>.Order.In.Iterator(tree: tree))
+    }
+}
+
+extension Tree.N.Order.In.Sequence: Sequenceable where Element: Copyable {
+    @_implements(Sequenceable, Iterator)
+    public typealias SequenceableIterator = Tree<Element>.N<n>.Order.In.Iterator
+
+    public consuming func makeIterator() -> Tree<Element>.N<n>.Order.In.Iterator {
+        Tree<Element>.N<n>.Order.In.Iterator(tree: tree)
+    }
+}

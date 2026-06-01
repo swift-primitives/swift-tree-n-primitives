@@ -15,10 +15,6 @@ extension Tree.N.Bounded.Order.Post {
 
     /// A sequence that yields elements in post-order traversal.
     public struct Sequence {
-        let tree: Tree.N<n>.Bounded
-
-        public func makeIterator() -> Iterator {
-            Iterator(tree: tree)
-        }
+        package let tree: Tree.N<n>.Bounded
     }
 }
