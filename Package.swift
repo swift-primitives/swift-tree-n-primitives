@@ -47,8 +47,7 @@ let package = Package(
                 .product(name: "Tree Primitives Core", package: "swift-tree-primitives"),
                 .product(name: "Buffer Arena Primitives", package: "swift-buffer-arena-primitives"),
                 .product(name: "Index Primitives", package: "swift-index-primitives"),
-                .product(name: "Queue Primitives Core", package: "swift-queue-primitives"),
-                .product(name: "Queue Dynamic Primitives", package: "swift-queue-primitives"),
+                .product(name: "Queue Primitives", package: "swift-queue-primitives"),
                 .product(name: "Stack Primitives", package: "swift-stack-primitives"),
             ]
         ),
@@ -59,8 +58,7 @@ let package = Package(
             dependencies: [
                 "Tree N Primitive",
                 .product(name: "Buffer Arena Primitives", package: "swift-buffer-arena-primitives"),
-                .product(name: "Queue Primitives Core", package: "swift-queue-primitives"),
-                .product(name: "Queue Dynamic Primitives", package: "swift-queue-primitives"),
+                .product(name: "Queue Primitives", package: "swift-queue-primitives"),
                 .product(name: "Stack Primitives", package: "swift-stack-primitives"),
             ]
         ),
@@ -73,8 +71,7 @@ let package = Package(
                 "Tree N Primitive",
                 .product(name: "Buffer Arena Inline Primitives", package: "swift-buffer-arena-primitives"),
                 .product(name: "Buffer Arena Primitives", package: "swift-buffer-arena-primitives"),
-                .product(name: "Queue Primitives Core", package: "swift-queue-primitives"),
-                .product(name: "Queue Dynamic Primitives", package: "swift-queue-primitives"),
+                .product(name: "Queue Primitives", package: "swift-queue-primitives"),
                 .product(name: "Stack Primitives", package: "swift-stack-primitives"),
             ]
         ),
@@ -85,8 +82,7 @@ let package = Package(
                 "Tree N Primitive",
                 .product(name: "Buffer Arena Inline Primitives", package: "swift-buffer-arena-primitives"),
                 .product(name: "Buffer Arena Primitives", package: "swift-buffer-arena-primitives"),
-                .product(name: "Queue Primitives Core", package: "swift-queue-primitives"),
-                .product(name: "Queue Dynamic Primitives", package: "swift-queue-primitives"),
+                .product(name: "Queue Primitives", package: "swift-queue-primitives"),
                 .product(name: "Stack Primitives", package: "swift-stack-primitives"),
             ]
         ),

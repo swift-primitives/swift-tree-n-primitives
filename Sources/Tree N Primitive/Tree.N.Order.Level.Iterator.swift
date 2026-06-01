@@ -9,8 +9,7 @@
 //
 // ===----------------------------------------------------------------------===//
 
-public import Queue_Dynamic_Primitives
-internal import Queue_Primitives_Core
+public import Queue_Primitives
 
 // MARK: - Level-Order Iterator
 

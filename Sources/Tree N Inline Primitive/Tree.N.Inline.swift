@@ -10,8 +10,7 @@
 // ===----------------------------------------------------------------------===//
 
 internal import Buffer_Arena_Primitives
-public import Queue_Dynamic_Primitives
-public import Queue_Primitives_Core
+public import Queue_Primitives
 public import Stack_Primitives
 
 // MARK: - Inline N-ary Tree
