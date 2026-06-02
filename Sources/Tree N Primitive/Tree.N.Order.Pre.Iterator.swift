@@ -39,9 +39,8 @@ extension Tree.N.Order.Pre {
             guard !pending.isEmpty else { return nil }
 
             let index = pending.pop()!
-            let nodePtr = unsafe tree._arena.pointer(at: index)
-            let element = unsafe nodePtr.pointee.element
-            let childIndices = unsafe nodePtr.pointee.childIndices
+            let element = tree._arena[index].element
+            let childIndices = tree._arena[index].childIndices
 
             for slot in stride(from: n - 1, through: 0, by: -1) {
                 if let child = childIndices[slot] {

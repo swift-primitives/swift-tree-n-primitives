@@ -39,11 +39,11 @@ extension Tree.N.Bounded.Order.Level {
             guard !pending.isEmpty else { return nil }
 
             let index = pending.dequeue()!
-            let nodePtr = unsafe tree._arena.pointer(at: index)
-            let element = unsafe nodePtr.pointee.element
+            let element = tree._arena[index].element
 
+            let childIndices = tree._arena[index].childIndices
             for slot in 0..<n {
-                if let child = unsafe nodePtr.pointee.childIndices[slot] {
+                if let child = childIndices[slot] {
                     pending.enqueue(child)
                 }
             }

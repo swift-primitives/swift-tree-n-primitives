@@ -124,8 +124,7 @@ extension Tree.N.Bounded where Element: ~Copyable {
         } catch {
             return nil
         }
-        let nodePtr = unsafe _arena.pointer(at: _slot(position.index))
-        guard let child = unsafe nodePtr.pointee.childIndices[slot.index] else { return nil }
+        guard let child = _arena[_slot(position.index)].childIndices[slot.index] else { return nil }
         let token = _arena.token(at: child)
         return Tree.Position(index: child, token: token)
     }
@@ -138,7 +137,7 @@ extension Tree.N.Bounded where Element: ~Copyable {
         } catch {
             return nil
         }
-        guard let parentIndex = unsafe _arena.pointer(at: _slot(position.index)).pointee.parentIndex else {
+        guard let parentIndex = _arena[_slot(position.index)].parentIndex else {
             return nil
         }
         let token = _arena.token(at: parentIndex)
@@ -153,7 +152,7 @@ extension Tree.N.Bounded where Element: ~Copyable {
         } catch {
             return false
         }
-        return unsafe _arena.pointer(at: _slot(position.index)).pointee.childCount == .zero
+        return _arena[_slot(position.index)].childCount == .zero
     }
 
     /// Returns the number of children of the node at the given position.
@@ -164,7 +163,7 @@ extension Tree.N.Bounded where Element: ~Copyable {
         } catch {
             return nil
         }
-        return unsafe _arena.pointer(at: _slot(position.index)).pointee.childCount
+        return _arena[_slot(position.index)].childCount
     }
 }
 
@@ -215,11 +214,8 @@ extension Tree.N.Bounded where Element: ~Copyable {
 
         case .child(of: let parent, let slot):
             try _validate(parent)
-            do {
-                let parentPtr = unsafe _arena.pointer(at: _slot(parent.index))
-                guard unsafe parentPtr.pointee.childIndices[slot.index] == nil else {
-                    throw .slotOccupied
-                }
+            guard _arena[_slot(parent.index)].childIndices[slot.index] == nil else {
+                throw .slotOccupied
             }
             guard !_arena.isFull else {
                 throw .overflow
@@ -232,9 +228,8 @@ extension Tree.N.Bounded where Element: ~Copyable {
             } catch {
                 throw .overflow
             }
-            let parentPtr = unsafe _arena.pointer(at: _slot(parent.index))
-            unsafe (parentPtr.pointee.childIndices[slot.index] = arenaPos.slot)
-            unsafe (parentPtr.pointee.childCount += .one)
+            _arena[_slot(parent.index)].childIndices[slot.index] = arenaPos.slot
+            _arena[_slot(parent.index)].childCount += .one
             return Tree.Position(index: arenaPos.slot, token: arenaPos.token)
         }
     }
@@ -245,17 +240,15 @@ extension Tree.N.Bounded where Element: ~Copyable {
     public mutating func remove(at position: Tree.Position) throws(__TreeNBoundedError) -> Element {
         try _validate(position)
 
-        let nodePtr = unsafe _arena.pointer(at: _slot(position.index))
-        guard unsafe nodePtr.pointee.childCount == .zero else {
+        guard _arena[_slot(position.index)].childCount == .zero else {
             throw .cannotRemoveNonLeaf
         }
 
-        if let parentIndex = unsafe nodePtr.pointee.parentIndex {
-            let parentPtr = unsafe _arena.pointer(at: parentIndex)
+        if let parentIndex = _arena[_slot(position.index)].parentIndex {
             for slot in 0..<n {
-                if unsafe parentPtr.pointee.childIndices[slot] == _slot(position.index) {
-                    unsafe (parentPtr.pointee.childIndices[slot] = nil)
-                    unsafe (parentPtr.pointee.childCount = parentPtr.pointee.childCount.subtract.saturating(.one))
+                if _arena[parentIndex].childIndices[slot] == _slot(position.index) {
+                    _arena[parentIndex].childIndices[slot] = nil
+                    _arena[parentIndex].childCount = _arena[parentIndex].childCount.subtract.saturating(.one)
                     break
                 }
             }
@@ -272,12 +265,11 @@ extension Tree.N.Bounded where Element: ~Copyable {
     public mutating func removeSubtree(at position: Tree.Position) throws(__TreeNBoundedError) {
         try _validate(position)
 
-        if let parentIndex = unsafe _arena.pointer(at: _slot(position.index)).pointee.parentIndex {
-            let parentPtr = unsafe _arena.pointer(at: parentIndex)
+        if let parentIndex = _arena[_slot(position.index)].parentIndex {
             for slot in 0..<n {
-                if unsafe parentPtr.pointee.childIndices[slot] == _slot(position.index) {
-                    unsafe (parentPtr.pointee.childIndices[slot] = nil)
-                    unsafe (parentPtr.pointee.childCount = parentPtr.pointee.childCount.subtract.saturating(.one))
+                if _arena[parentIndex].childIndices[slot] == _slot(position.index) {
+                    _arena[parentIndex].childIndices[slot] = nil
+                    _arena[parentIndex].childCount = _arena[parentIndex].childCount.subtract.saturating(.one)
                     break
                 }
             }
@@ -292,8 +284,7 @@ extension Tree.N.Bounded where Element: ~Copyable {
 
         while !pending.isEmpty {
             let current = pending.peek()!
-            let nodePtr = unsafe _arena.pointer(at: current)
-            let childIndices = unsafe nodePtr.pointee.childIndices
+            let childIndices = _arena[current].childIndices
 
             var rightmostChild: Index<Node>? = nil
             for slot in stride(from: n - 1, through: 0, by: -1) {
@@ -337,7 +328,7 @@ extension Tree.N.Bounded where Element: ~Copyable {
         } catch {
             return nil
         }
-        return unsafe body(_arena.pointer(at: _slot(position.index)).pointee.element)
+        return body(_arena[_slot(position.index)].element)
     }
 
     /// Clears all nodes from the tree.
@@ -362,9 +353,9 @@ extension Tree.N.Bounded where Element: ~Copyable {
             let (index, depth) = pending.pop()!
             maxHeight = Swift.max(maxHeight, depth)
 
-            let nodePtr = unsafe _arena.pointer(at: index)
+            let childIndices = _arena[index].childIndices
             for slot in 0..<n {
-                if let child = unsafe nodePtr.pointee.childIndices[slot] {
+                if let child = childIndices[slot] {
                     pending.push((child, depth + .one))
                 }
             }
@@ -387,11 +378,11 @@ extension Tree.N.Bounded where Element: ~Copyable {
 
         while !pending.isEmpty {
             let index = pending.pop()!
-            let nodePtr = unsafe _arena.pointer(at: index)
-            unsafe body(nodePtr.pointee.element)
+            body(_arena[index].element)
 
+            let childIndices = _arena[index].childIndices
             for slot in stride(from: n - 1, through: 0, by: -1) {
-                if let child = unsafe nodePtr.pointee.childIndices[slot] {
+                if let child = childIndices[slot] {
                     pending.push(child)
                 }
             }
@@ -408,8 +399,7 @@ extension Tree.N.Bounded where Element: ~Copyable {
 
         while !pending.isEmpty {
             let current = pending.peek()!
-            let nodePtr = unsafe _arena.pointer(at: current)
-            let childIndices = unsafe nodePtr.pointee.childIndices
+            let childIndices = _arena[current].childIndices
 
             var rightmostChild: Index<Node>? = nil
             for slot in stride(from: n - 1, through: 0, by: -1) {
@@ -433,7 +423,7 @@ extension Tree.N.Bounded where Element: ~Copyable {
 
             if isLeaf || cameFromRightmost || cameFromLeftmostNoOther {
                 _ = pending.pop()
-                unsafe body(nodePtr.pointee.element)
+                body(_arena[current].element)
                 lastVisited = current
             } else {
                 for slot in stride(from: n - 1, through: 0, by: -1) {
@@ -455,12 +445,12 @@ extension Tree.N.Bounded where Element: ~Copyable {
 
         while !pending.isEmpty {
             let index = pending.dequeue()!
-            let nodePtr = unsafe _arena.pointer(at: index)
 
-            unsafe body(nodePtr.pointee.element)
+            body(_arena[index].element)
 
+            let childIndices = _arena[index].childIndices
             for slot in 0..<n {
-                if let child = unsafe nodePtr.pointee.childIndices[slot] {
+                if let child = childIndices[slot] {
                     pending.enqueue(child)
                 }
             }
@@ -482,13 +472,12 @@ extension Tree.N.Bounded where Element: ~Copyable, n == 2 {
         while current != nil || !pending.isEmpty {
             while let c = current {
                 pending.push(c)
-                current = unsafe _arena.pointer(at: c).pointee.childIndices[0]
+                current = _arena[c].childIndices[0]
             }
 
             let c = pending.pop()!
-            let nodePtr = unsafe _arena.pointer(at: c)
-            unsafe body(nodePtr.pointee.element)
-            current = unsafe nodePtr.pointee.childIndices[1]
+            body(_arena[c].element)
+            current = _arena[c].childIndices[1]
         }
     }
 }
@@ -531,11 +520,8 @@ extension Tree.N.Bounded where Element: Copyable {
 
         case .child(of: let parent, let slot):
             try _validate(parent)
-            do {
-                let parentPtr = unsafe _arena.pointer(at: _slot(parent.index))
-                guard unsafe parentPtr.pointee.childIndices[slot.index] == nil else {
-                    throw .slotOccupied
-                }
+            guard _arena[_slot(parent.index)].childIndices[slot.index] == nil else {
+                throw .slotOccupied
             }
             guard !_arena.isFull else {
                 throw .overflow
@@ -548,9 +534,8 @@ extension Tree.N.Bounded where Element: Copyable {
             } catch {
                 throw .overflow
             }
-            let parentPtr = unsafe _arena.pointer(at: _slot(parent.index))
-            unsafe (parentPtr.pointee.childIndices[slot.index] = arenaPos.slot)
-            unsafe (parentPtr.pointee.childCount += .one)
+            _arena[_slot(parent.index)].childIndices[slot.index] = arenaPos.slot
+            _arena[_slot(parent.index)].childCount += .one
             return Tree.Position(index: arenaPos.slot, token: arenaPos.token)
         }
     }
@@ -563,7 +548,7 @@ extension Tree.N.Bounded where Element: Copyable {
         } catch {
             return nil
         }
-        return unsafe _arena.pointer(at: _slot(position.index)).pointee.element
+        return _arena[_slot(position.index)].element
     }
 }
 
