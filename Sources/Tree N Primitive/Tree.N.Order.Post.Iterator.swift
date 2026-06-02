@@ -44,8 +44,7 @@ extension Tree.N.Order.Post {
         public mutating func next() -> Element? {
             while !pending.isEmpty {
                 let current = pending.peek()!
-                let nodePtr = unsafe tree._arena.pointer(at: current)
-                let childIndices = unsafe nodePtr.pointee.childIndices
+                let childIndices = tree._arena[current].childIndices
 
                 var rightmostChild: Index<Tree.N<n>.Node>? = nil
                 for slot in stride(from: n - 1, through: 0, by: -1) {
@@ -70,7 +69,7 @@ extension Tree.N.Order.Post {
                 if isLeaf || cameFromRightmost || cameFromLeftmostNoOther {
                     _ = pending.pop()
                     lastVisited = current
-                    return unsafe nodePtr.pointee.element
+                    return tree._arena[current].element
                 } else {
                     for slot in stride(from: n - 1, through: 0, by: -1) {
                         if let child = childIndices[slot] {

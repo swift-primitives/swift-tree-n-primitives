@@ -43,16 +43,15 @@ extension Tree.N.Order.In {
                 // Go to leftmost node
                 while let c = current {
                     pending.push(c)
-                    current = unsafe tree._arena.pointer(at: c).pointee.childIndices[0]
+                    current = tree._arena[c].childIndices[0]
                 }
 
                 // Process node
                 let c = pending.pop()!
-                let nodePtr = unsafe tree._arena.pointer(at: c)
-                let element = unsafe nodePtr.pointee.element
+                let element = tree._arena[c].element
 
                 // Move to right subtree
-                current = unsafe nodePtr.pointee.childIndices[1]
+                current = tree._arena[c].childIndices[1]
 
                 return element
             }

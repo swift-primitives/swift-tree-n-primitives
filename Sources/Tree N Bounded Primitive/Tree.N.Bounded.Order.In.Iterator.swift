@@ -43,13 +43,12 @@ extension Tree.N.Bounded.Order.In {
             while current != nil || !pending.isEmpty {
                 while let c = current {
                     pending.push(c)
-                    current = unsafe tree._arena.pointer(at: c).pointee.childIndices[0]
+                    current = tree._arena[c].childIndices[0]
                 }
 
                 let c = pending.pop()!
-                let nodePtr = unsafe tree._arena.pointer(at: c)
-                let element = unsafe nodePtr.pointee.element
-                current = unsafe nodePtr.pointee.childIndices[1]
+                let element = tree._arena[c].element
+                current = tree._arena[c].childIndices[1]
 
                 return element
             }
