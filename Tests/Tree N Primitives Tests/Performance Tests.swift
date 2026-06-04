@@ -428,7 +428,7 @@ struct TreeBinaryStatsTests {
 
         print("Tree<String>.N<2>.Node: size=\(MemoryLayout<Tree<String>.N<2>.Node>.size) stride=\(MemoryLayout<Tree<String>.N<2>.Node>.stride)")
 
-        print("Buffer.Arena.Header: size=\(MemoryLayout<Buffer<Tree<Int>.N<2>.Node>.Arena.Header>.size) stride=\(MemoryLayout<Buffer<Tree<Int>.N<2>.Node>.Arena.Header>.stride)")
+        print("Buffer.Arena.Header: size=\(MemoryLayout<Buffer<Storage<Tree<Int>.N<2>.Node>.Arena>.Arena.Header>.size) stride=\(MemoryLayout<Buffer<Storage<Tree<Int>.N<2>.Node>.Arena>.Arena.Header>.stride)")
 
         print("Tree<Int>.N<2>: size=\(MemoryLayout<Tree<Int>.N<2>>.size) stride=\(MemoryLayout<Tree<Int>.N<2>>.stride)")
         print("Tree<Int>.Binary.Bounded: size=\(MemoryLayout<Tree<Int>.Binary.Bounded>.size) stride=\(MemoryLayout<Tree<Int>.Binary.Bounded>.stride)")
