@@ -54,7 +54,7 @@ extension Tree.N where Element: ~Copyable {
         var _rootIndex: Index<Node>?
 
         @usableFromInline
-        var _arena: Buffer<Node>.Arena.Inline<capacity>
+        var _arena: Buffer<Storage<Node>.Arena>.Arena.Inline<capacity>
 
         // MARK: - Helpers
 
@@ -68,7 +68,7 @@ extension Tree.N where Element: ~Copyable {
         @inlinable
         public init() {
             self._rootIndex = nil
-            self._arena = Buffer<Node>.Arena.Inline<capacity>()
+            self._arena = Buffer<Storage<Node>.Arena>.Arena.Inline<capacity>()
         }
 
         // Element cleanup is handled by Buffer.Arena.Inline's deinit, which
@@ -199,7 +199,7 @@ extension Tree.N.Inline where Element: ~Copyable {
             guard !_arena.isFull else {
                 throw .overflow
             }
-            let arenaPos: Buffer<Node>.Arena.Position
+            let arenaPos: Buffer<Storage<Node>.Arena>.Arena.Position
             do {
                 arenaPos = try _arena.insert(Node(element: element))
             } catch {
@@ -219,7 +219,7 @@ extension Tree.N.Inline where Element: ~Copyable {
             guard !_arena.isFull else {
                 throw .overflow
             }
-            let arenaPos: Buffer<Node>.Arena.Position
+            let arenaPos: Buffer<Storage<Node>.Arena>.Arena.Position
             do {
                 arenaPos = try _arena.insert(
                     Node(element: element, parentIndex: _slot(parent.index))

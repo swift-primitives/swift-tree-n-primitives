@@ -50,7 +50,7 @@ extension Tree.N where Element: ~Copyable {
         // MARK: - Storage
 
         @usableFromInline
-        var _arena: Buffer<Node>.Arena.Bounded
+        var _arena: Buffer<Storage<Node>.Arena>.Arena.Bounded
 
         /// Index of root node (nil if empty).
         @usableFromInline
@@ -73,7 +73,7 @@ extension Tree.N where Element: ~Copyable {
         @inlinable
         public init(capacity: Count) {
             self.capacity = capacity
-            self._arena = Buffer<Node>.Arena.Bounded(minimumCapacity: capacity)
+            self._arena = Buffer<Storage<Node>.Arena>.Arena.Bounded(minimumCapacity: capacity)
             self._rootIndex = nil
         }
 
@@ -103,7 +103,7 @@ extension Tree.N where Element: ~Copyable {
 
         @usableFromInline
         func _validate(_ position: Tree.Position) throws(__TreeNBoundedError) {
-            let arenaPos = Buffer<Node>.Arena.Position(
+            let arenaPos = Buffer<Storage<Node>.Arena>.Arena.Position(
                 index: UInt32(Int(bitPattern: position.index)),
                 token: position.token
             )
@@ -203,7 +203,7 @@ extension Tree.N.Bounded where Element: ~Copyable {
             guard !_arena.isFull else {
                 throw .overflow
             }
-            let arenaPos: Buffer<Node>.Arena.Position
+            let arenaPos: Buffer<Storage<Node>.Arena>.Arena.Position
             do {
                 arenaPos = try _arena.insert(Node(element: element))
             } catch {
@@ -220,7 +220,7 @@ extension Tree.N.Bounded where Element: ~Copyable {
             guard !_arena.isFull else {
                 throw .overflow
             }
-            let arenaPos: Buffer<Node>.Arena.Position
+            let arenaPos: Buffer<Storage<Node>.Arena>.Arena.Position
             do {
                 arenaPos = try _arena.insert(
                     Node(element: element, parentIndex: _slot(parent.index))
@@ -509,7 +509,7 @@ extension Tree.N.Bounded where Element: Copyable {
             guard !_arena.isFull else {
                 throw .overflow
             }
-            let arenaPos: Buffer<Node>.Arena.Position
+            let arenaPos: Buffer<Storage<Node>.Arena>.Arena.Position
             do {
                 arenaPos = try _arena.insert(Node(element: element))
             } catch {
@@ -526,7 +526,7 @@ extension Tree.N.Bounded where Element: Copyable {
             guard !_arena.isFull else {
                 throw .overflow
             }
-            let arenaPos: Buffer<Node>.Arena.Position
+            let arenaPos: Buffer<Storage<Node>.Arena>.Arena.Position
             do {
                 arenaPos = try _arena.insert(
                     Node(element: element, parentIndex: _slot(parent.index))

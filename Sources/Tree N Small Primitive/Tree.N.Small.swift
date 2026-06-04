@@ -67,7 +67,7 @@ extension Tree.N where Element: ~Copyable {
         var _rootIndex: Index<Node>?
 
         @usableFromInline
-        var _arena: Buffer<Node>.Arena.Small<inlineCapacity>
+        var _arena: Buffer<Storage<Node>.Arena>.Arena.Small<inlineCapacity>
 
         // MARK: - Helpers
 
@@ -81,7 +81,7 @@ extension Tree.N where Element: ~Copyable {
         @inlinable
         public init() {
             self._rootIndex = nil
-            self._arena = Buffer<Node>.Arena.Small<inlineCapacity>()
+            self._arena = Buffer<Storage<Node>.Arena>.Arena.Small<inlineCapacity>()
         }
 
         // Element cleanup is handled by Buffer.Arena.Inline's deinit (inline case)
