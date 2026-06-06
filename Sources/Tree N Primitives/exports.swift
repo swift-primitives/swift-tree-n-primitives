@@ -6,5 +6,3 @@
 
 @_exported public import Tree_N_Primitive
 @_exported public import Tree_N_Bounded_Primitives
-@_exported public import Tree_N_Inline_Primitives
-@_exported public import Tree_N_Small_Primitives

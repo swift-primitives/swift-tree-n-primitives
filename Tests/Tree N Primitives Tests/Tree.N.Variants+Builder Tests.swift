@@ -16,44 +16,7 @@ import Tree_N_Primitives_Test_Support
 
 @Suite("Tree.N variants + Builder")
 struct TreeNVariantsBuilderTests {
-    @Suite struct InlineTree {}
-    @Suite struct SmallTree {}
     @Suite struct BoundedTree {}
-}
-
-extension TreeNVariantsBuilderTests.InlineTree {
-    @Test
-    func `Inline within capacity`() throws {
-        let tree = try Tree<Int>.N<2>.Inline<8> { 1; 2; 3 }
-        let isEmpty = tree.isEmpty
-        #expect(!isEmpty)
-    }
-
-    @Test
-    func `Inline throws on overflow`() {
-        do {
-            _ = try Tree<Int>.N<2>.Inline<2> { 1; 2; 3 }
-            Issue.record("expected throw")
-        } catch {
-            // expected
-        }
-    }
-}
-
-extension TreeNVariantsBuilderTests.SmallTree {
-    @Test
-    func `Small within inline`() throws {
-        var tree = try Tree<Int>.N<2>.Small<8> { 1; 2; 3 }
-        let isEmpty = tree.isEmpty
-        #expect(!isEmpty)
-    }
-
-    @Test
-    func `Small spills to heap`() throws {
-        var tree = try Tree<Int>.N<2>.Small<2> { 1; 2; 3; 4; 5 }
-        let isEmpty = tree.isEmpty
-        #expect(!isEmpty)
-    }
 }
 
 extension TreeNVariantsBuilderTests.BoundedTree {

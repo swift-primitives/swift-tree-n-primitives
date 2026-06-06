@@ -291,31 +291,6 @@ struct TreeBinaryPerformanceTests {
         #expect(tree.isFull)
     }
 
-    // MARK: - Small Spill Performance
-
-    @Test
-    func `Small spill and grow to 1,000 nodes`() throws {
-        var tree = try Tree<Int>.Binary.Small<8>()
-        var positions: [Tree<Int>.Position] = []
-        positions.reserveCapacity(1_000)
-
-        positions.append(try tree.insert(0, at: .root))
-        for i in 1..<1_000 {
-            let parentIndex = (i - 1) / 2
-            let parent = positions[parentIndex]
-            if i % 2 == 1 {
-                positions.append(try tree.insert(i, at: .left(of: parent)))
-            } else {
-                positions.append(try tree.insert(i, at: .right(of: parent)))
-            }
-        }
-
-        let count = tree.count
-        let isSpilled = tree.isSpilled
-        #expect(count == 1_000)
-        #expect(isSpilled)
-    }
-
     // MARK: - Memory Layout Verification
 
     @Test
@@ -724,7 +699,6 @@ struct TreeBinaryStatsTests {
 
     @Test
     func `Variant comparison - insert 128 nodes`() throws {
-        // nodeCount bounded by Inline stack budget: 128 × ~72 bytes ≈ 9KB
         let nodeCount = 128
         let clock = ContinuousClock()
 
@@ -760,43 +734,9 @@ struct TreeBinaryStatsTests {
             }
         }
 
-        // Tree.N.Inline (stack-allocated: 128 × ~72 bytes ≈ 9KB)
-        let inlineTime = try clock.measure {
-            var tree = Tree<Int>.Binary.Inline<128>()
-            var positions: [Tree<Int>.Position] = []
-            positions.reserveCapacity(nodeCount)
-            positions.append(try tree.insert(0, at: .root))
-            for i in 1..<nodeCount {
-                let p = (i - 1) / 2
-                if i % 2 == 1 {
-                    positions.append(try tree.insert(i, at: .left(of: positions[p])))
-                } else {
-                    positions.append(try tree.insert(i, at: .right(of: positions[p])))
-                }
-            }
-        }
-
-        // Tree.N.Small (starts inline, spills to heap)
-        let smallTime = try clock.measure {
-            var tree = Tree<Int>.Binary.Small<16>()
-            var positions: [Tree<Int>.Position] = []
-            positions.reserveCapacity(nodeCount)
-            positions.append(try tree.insert(0, at: .root))
-            for i in 1..<nodeCount {
-                let p = (i - 1) / 2
-                if i % 2 == 1 {
-                    positions.append(try tree.insert(i, at: .left(of: positions[p])))
-                } else {
-                    positions.append(try tree.insert(i, at: .right(of: positions[p])))
-                }
-            }
-        }
-
         print("=== Variant Comparison (\(nodeCount) node complete binary tree) ===")
         print("Tree.N (growable):   \(growableTime)")
         print("Tree.N.Bounded:      \(boundedTime)")
-        print("Tree.N.Inline<128>:  \(inlineTime)")
-        print("Tree.N.Small<16>:    \(smallTime)")
     }
 
     // MARK: - CoW Cost

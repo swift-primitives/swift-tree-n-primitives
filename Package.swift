@@ -15,13 +15,9 @@ let package = Package(
         // MARK: - Type modules (lean ~Copyable types + storage-touching @inlinable ops, co-located per [MOD-036])
         .library(name: "Tree N Primitive", targets: ["Tree N Primitive"]),
         .library(name: "Tree N Bounded Primitive", targets: ["Tree N Bounded Primitive"]),
-        .library(name: "Tree N Inline Primitive", targets: ["Tree N Inline Primitive"]),
-        .library(name: "Tree N Small Primitive", targets: ["Tree N Small Primitive"]),
         // MARK: - Ops modules (isolated Copyable conformances); `Tree N Primitives` doubles as the [MOD-005] umbrella
         .library(name: "Tree N Primitives", targets: ["Tree N Primitives"]),
         .library(name: "Tree N Bounded Primitives", targets: ["Tree N Bounded Primitives"]),
-        .library(name: "Tree N Inline Primitives", targets: ["Tree N Inline Primitives"]),
-        .library(name: "Tree N Small Primitives", targets: ["Tree N Small Primitives"]),
         // MARK: - Test Support
         .library(name: "Tree N Primitives Test Support", targets: ["Tree N Primitives Test Support"]),
     ],
@@ -68,42 +64,15 @@ let package = Package(
                 .product(name: "Iterator Protocol", package: "swift-iterator-primitives"),
             ]
         ),
-        // Inline capacity variant — unconditionally ~Copyable (@_rawLayout inline arena).
-        // Distinct backing: Buffer Arena Inline ([MOD-008] — kept a separate target so
-        // base/Bounded consumers do not pull the inline backing).
-        .target(
-            name: "Tree N Inline Primitive",
-            dependencies: [
-                "Tree N Primitive",
-                .product(name: "Buffer Arena Inline Primitives", package: "swift-buffer-arena-primitives"),
-                .product(name: "Buffer Arena Primitives", package: "swift-buffer-arena-primitives"),
-                .product(name: "Queue Primitives", package: "swift-queue-primitives"),
-                .product(name: "Stack Primitives", package: "swift-stack-primitives"),
-            ]
-        ),
-        // Small capacity variant — inline storage with heap spill.
-        .target(
-            name: "Tree N Small Primitive",
-            dependencies: [
-                "Tree N Primitive",
-                .product(name: "Buffer Arena Inline Primitives", package: "swift-buffer-arena-primitives"),
-                .product(name: "Buffer Arena Primitives", package: "swift-buffer-arena-primitives"),
-                .product(name: "Queue Primitives", package: "swift-queue-primitives"),
-                .product(name: "Stack Primitives", package: "swift-stack-primitives"),
-            ]
-        ),
-
         // MARK: - Ops modules
         // Base ops + umbrella ([MOD-005]/[MOD-036] base-plural-as-umbrella): isolated
-        // base Swift.Sequence conformances + re-export of base type and all variant ops.
+        // base Swift.Sequence conformances + re-export of base type and the Bounded variant ops.
         // Acyclic: depends on the variant OPS modules, which depend on TYPE modules — never back.
         .target(
             name: "Tree N Primitives",
             dependencies: [
                 "Tree N Primitive",
                 "Tree N Bounded Primitives",
-                "Tree N Inline Primitives",
-                "Tree N Small Primitives",
                 .product(name: "Iterable", package: "swift-iterator-primitives"),
                 .product(name: "Iterator Primitive", package: "swift-iterator-primitives"),
                 .product(name: "Iterator Chunk Primitives", package: "swift-iterator-primitives"),
@@ -119,14 +88,6 @@ let package = Package(
                 .product(name: "Iterator Chunk Primitives", package: "swift-iterator-primitives"),
                 .product(name: "Sequence Protocol Primitives", package: "swift-sequence-primitives"),
             ]
-        ),
-        .target(
-            name: "Tree N Inline Primitives",
-            dependencies: ["Tree N Inline Primitive"]
-        ),
-        .target(
-            name: "Tree N Small Primitives",
-            dependencies: ["Tree N Small Primitive"]
         ),
 
         // MARK: - Test Support ([MOD-024] spine)
