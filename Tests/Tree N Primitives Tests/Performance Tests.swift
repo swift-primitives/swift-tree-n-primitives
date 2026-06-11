@@ -272,7 +272,7 @@ struct TreeBinaryPerformanceTests {
 
     @Test
     func `Bounded insert 10,000 nodes`() throws {
-        var tree = try Tree<Int>.Binary.Bounded(capacity: 10_000)
+        var tree = Tree<Int>.Binary.Bounded(capacity: 10_000)
         var positions: [Tree<Int>.Position] = []
         positions.reserveCapacity(10_000)
 
@@ -572,7 +572,7 @@ struct TreeBinaryStatsTests {
 
         // Pre-reserved
         let preReservedTime = try clock.measure {
-            var tree = try Tree<Int>.Binary(minimumCapacity: 10_000)
+            var tree = Tree<Int>.Binary(minimumCapacity: 10_000)
             var positions: [Tree<Int>.Position] = []
             positions.reserveCapacity(nodeCount)
             positions.append(try tree.insert(0, at: .root))
@@ -589,7 +589,7 @@ struct TreeBinaryStatsTests {
 
         // Bounded
         let boundedTime = try clock.measure {
-            var tree = try Tree<Int>.Binary.Bounded(capacity: 10_000)
+            var tree = Tree<Int>.Binary.Bounded(capacity: 10_000)
             var positions: [Tree<Int>.Position] = []
             positions.reserveCapacity(nodeCount)
             positions.append(try tree.insert(0, at: .root))
@@ -725,7 +725,7 @@ struct TreeBinaryStatsTests {
 
         // Tree.N.Bounded
         let boundedTime = try clock.measure {
-            var tree = try Tree<Int>.Binary.Bounded(capacity: 128)
+            var tree = Tree<Int>.Binary.Bounded(capacity: 128)
             var positions: [Tree<Int>.Position] = []
             positions.reserveCapacity(nodeCount)
             positions.append(try tree.insert(0, at: .root))
@@ -928,7 +928,7 @@ struct TreeBinaryStatsTests {
 
         // Random access: peek at positions in array order (sequential slot access)
         var sum = 0
-        let sequentialTime = clock.measure {
+        _ = clock.measure {
             for _ in 0..<iterations {
                 for pos in positions {
                     sum += tree.peek(at: pos) ?? 0
@@ -938,7 +938,7 @@ struct TreeBinaryStatsTests {
 
         // Walk root-to-leaf: chase parent/child pointers
         var walkCount = 0
-        let walkTime = clock.measure {
+        _ = clock.measure {
             for _ in 0..<iterations {
                 var pos = tree.root!
                 while true {
@@ -954,11 +954,11 @@ struct TreeBinaryStatsTests {
             }
         }
 
-        let seqNs = Double(sequentialTime.components.attoseconds) / 1e9
-        let walkNs = Double(walkTime.components.attoseconds) / 1e9
-        let totalSeqOps = nodeCount * iterations
-        let nsPerSeqOp = seqNs / Double(totalSeqOps)
-        let nsPerWalkOp = walkNs / Double(walkCount)
+        // let seqNs = Double(sequentialTime.components.attoseconds) / 1e9
+        // let walkNs = Double(walkTime.components.attoseconds) / 1e9
+        // let totalSeqOps = nodeCount * iterations
+        // let nsPerSeqOp = seqNs / Double(totalSeqOps)
+        // let nsPerWalkOp = walkNs / Double(walkCount)
 
         print("=== Navigation Cost (\(nodeCount) nodes) ===")
         //        print("Sequential peek (\(totalSeqOps) ops): \(sequentialTime)  (\(String(format: "%.1f", nsPerSeqOp)) ns/op)")

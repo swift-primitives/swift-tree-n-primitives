@@ -265,7 +265,7 @@ struct TreeNBoundedTests {
 
     @Test
     func `Bounded initialization`() throws {
-        let tree = try Tree<Int>.N<2>.Bounded(capacity: 10)
+        let tree = Tree<Int>.N<2>.Bounded(capacity: 10)
         #expect(tree.isEmpty)
         #expect(tree.count == 0)
         #expect(tree.capacity == 10)
@@ -274,7 +274,7 @@ struct TreeNBoundedTests {
 
     @Test
     func `Bounded insert and overflow`() throws {
-        var tree = try Tree<Int>.N<2>.Bounded(capacity: 3)
+        var tree = Tree<Int>.N<2>.Bounded(capacity: 3)
 
         let root = try tree.insert(1, at: .root)
         _ = try tree.insert(2, at: .left(of: root))
@@ -293,7 +293,7 @@ struct TreeNBoundedTests {
 
     @Test
     func `Bounded traversal`() throws {
-        var tree = try Tree<Int>.N<2>.Bounded(capacity: 5)
+        var tree = Tree<Int>.N<2>.Bounded(capacity: 5)
         let root = try tree.insert(1, at: .root)
         let left = try tree.insert(2, at: .left(of: root))
         _ = try tree.insert(3, at: .right(of: root))
@@ -441,15 +441,15 @@ struct TreeNSendableTests {
         let root = try tree.insert(42, at: .root)
         _ = try tree.insert(1, at: .left(of: root))
 
-        requireSendable(tree)
+        unsafe requireSendable(tree)
     }
 
     @Test
     func `Sendable bounded`() throws {
-        var tree = try Tree<Int>.N<2>.Bounded(capacity: 10)
+        var tree = Tree<Int>.N<2>.Bounded(capacity: 10)
         _ = try tree.insert(42, at: .root)
 
-        requireSendable(tree)
+        unsafe requireSendable(tree)
     }
 }
 
@@ -579,7 +579,7 @@ struct TreeNStalePositionTests {
 
     @Test
     func `Bounded stale position detection`() throws {
-        var tree = try Tree<Int>.N<2>.Bounded(capacity: 10)
+        var tree = Tree<Int>.N<2>.Bounded(capacity: 10)
         let root = try tree.insert(1, at: .root)
         let left = try tree.insert(2, at: .left(of: root))
 
