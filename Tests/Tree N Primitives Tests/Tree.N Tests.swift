@@ -366,9 +366,15 @@ struct TreeNNonCopyableTests {
             _ = try tree.insert(Token(5, tracker: tracker), at: .right(of: left))
         }
 
-        // Arena deinit frees in slot order (allocation order), not tree order.
-        // Tree.N is conditionally Copyable, so it cannot have a custom deinit.
-        #expect(tracker.order == [1, 2, 3, 4, 5])
+        // Column teardown (the Shared box's drain -> removeAll) frees in SLOT
+        // order, not tree order. Tree.N is conditionally Copyable, so it cannot
+        // have a custom deinit. Slot assignment is the pool's: fresh slots hand
+        // out densely until full; after each grow(to:) the door releases the
+        // fresh tail ascending into the pool's LIFO free list, so post-growth
+        // inserts fill from the highest fresh slot down. Capacity doubles from 1:
+        // 1->slot0; 2->slot1; grow(4) frees [2,3] -> 3->slot3, 4->slot2; grow(8)
+        // frees [4..7] -> 5->slot7. Slot-order walk: 0,1,2,3,7 -> values 1,2,4,3,5.
+        #expect(tracker.order == [1, 2, 4, 3, 5])
     }
 
     @Test

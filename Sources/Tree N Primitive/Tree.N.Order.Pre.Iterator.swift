@@ -9,7 +9,10 @@
 //
 // ===----------------------------------------------------------------------===//
 
-public import Queue_Primitives
+public import Store_Primitive
+public import Storage_Generational_Primitives
+public import Shared_Primitive
+public import Stack_Primitive
 internal import Stack_Primitives
 internal import Iterator_Primitive
 internal import Iterator_Protocol
@@ -24,13 +27,13 @@ extension Tree.N.Order.Pre {
         let tree: Tree.N<n>
 
         @usableFromInline
-        var pending: Stack<Index<Tree.N<n>.Node>>
+        var pending: Stack<Store.Generational.Handle>
 
         package init(tree: Tree.N<n>) {
             self.tree = tree
-            self.pending = Stack<Index<Tree.N<n>.Node>>()
-            if let rootIndex = tree._rootIndex {
-                self.pending.push(rootIndex)
+            self.pending = Stack<Store.Generational.Handle>()
+            if let rootHandle = tree._rootHandle {
+                self.pending.push(rootHandle)
             }
         }
 
@@ -38,12 +41,14 @@ extension Tree.N.Order.Pre {
         public mutating func next() -> Element? {
             guard !pending.isEmpty else { return nil }
 
-            let index = pending.pop()!
-            let element = tree._arena[index].element
-            let childIndices = tree._arena[index].childIndices
+            let handle = pending.pop()!
+            let (element, childHandles) = tree._storage.withColumn {
+                (column) -> (Element, InlineArray<n, Store.Generational.Handle?>) in
+                (column[handle].element, column[handle].childHandles)
+            }
 
             for slot in stride(from: n - 1, through: 0, by: -1) {
-                if let child = childIndices[slot] {
+                if let child = childHandles[slot] {
                     pending.push(child)
                 }
             }

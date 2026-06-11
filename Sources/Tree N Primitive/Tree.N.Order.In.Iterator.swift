@@ -9,7 +9,10 @@
 //
 // ===----------------------------------------------------------------------===//
 
-public import Queue_Primitives
+public import Store_Primitive
+public import Storage_Generational_Primitives
+public import Shared_Primitive
+public import Stack_Primitive
 internal import Stack_Primitives
 internal import Iterator_Primitive
 internal import Iterator_Protocol
@@ -26,15 +29,15 @@ extension Tree.N.Order.In {
         let tree: Tree.N<n>
 
         @usableFromInline
-        var pending: Stack<Index<Tree.N<n>.Node>>
+        var pending: Stack<Store.Generational.Handle>
 
         @usableFromInline
-        var current: Index<Tree.N<n>.Node>?
+        var current: Store.Generational.Handle?
 
         package init(tree: Tree.N<n>) {
             self.tree = tree
-            self.pending = Stack<Index<Tree.N<n>.Node>>()
-            self.current = tree._rootIndex
+            self.pending = Stack<Store.Generational.Handle>()
+            self.current = tree._rootHandle
         }
 
         @inlinable
@@ -43,15 +46,18 @@ extension Tree.N.Order.In {
                 // Go to leftmost node
                 while let c = current {
                     pending.push(c)
-                    current = tree._arena[c].childIndices[0]
+                    current = tree._storage.withColumn { $0[c].childHandles[0] }
                 }
 
                 // Process node
                 let c = pending.pop()!
-                let element = tree._arena[c].element
+                let (element, right) = tree._storage.withColumn {
+                    (column) -> (Element, Store.Generational.Handle?) in
+                    (column[c].element, column[c].childHandles[1])
+                }
 
                 // Move to right subtree
-                current = tree._arena[c].childIndices[1]
+                current = right
 
                 return element
             }

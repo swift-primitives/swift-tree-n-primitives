@@ -302,8 +302,10 @@ struct TreeBinaryPerformanceTests {
         // Position should be compact (index + token)
         #expect(positionSize <= 16)  // Int + UInt32 + padding
 
-        // Node should contain element + InlineArray<n, Index<Node>?> + childCount + parentIndex
-        #expect(nodeSize <= 64)  // Int element + typed indices + count + padding
+        // Node should contain element + InlineArray<n, Handle?> + childCount + parentHandle.
+        // Generational handles are (index, generation) Int pairs (16 B vs the retired
+        // arena's 8 B indices), so the n=2 node grows accordingly.
+        #expect(nodeSize <= 128)  // Int element + optional handles + count + padding
 
         // Print for manual inspection
         print("Position size: \(positionSize) bytes")
@@ -403,18 +405,21 @@ struct TreeBinaryStatsTests {
 
         print("Tree<String>.N<2>.Node: size=\(MemoryLayout<Tree<String>.N<2>.Node>.size) stride=\(MemoryLayout<Tree<String>.N<2>.Node>.stride)")
 
-        print("Buffer.Arena.Header: size=\(MemoryLayout<Buffer<Storage<Tree<Int>.N<2>.Node>.Arena>.Arena.Header>.size) stride=\(MemoryLayout<Buffer<Storage<Tree<Int>.N<2>.Node>.Arena>.Arena.Header>.stride)")
+        print("Store.Generational.Handle: size=\(MemoryLayout<Store.Generational.Handle>.size) stride=\(MemoryLayout<Store.Generational.Handle>.stride)")
 
         print("Tree<Int>.N<2>: size=\(MemoryLayout<Tree<Int>.N<2>>.size) stride=\(MemoryLayout<Tree<Int>.N<2>>.stride)")
         print("Tree<Int>.Binary.Bounded: size=\(MemoryLayout<Tree<Int>.Binary.Bounded>.size) stride=\(MemoryLayout<Tree<Int>.Binary.Bounded>.stride)")
 
-        // Bytes per node overhead (meta slot = 8 bytes per [TREE-META])
+        // Bytes per node overhead: the generational column's per-slot ledger
+        // (generation Int + occupancy Bool in side arrays) plus the tree's
+        // slot → live-Handle decode table (~16 B/slot, the accepted tax).
         let nodeStride = MemoryLayout<Tree<Int>.N<2>.Node>.stride
-        let metaSize = 8  // generation token (4) + free-list link (4)
-        print("Bytes per slot (node stride + meta): \(nodeStride + metaSize)")
+        let ledgerSize = 8 + 1  // generation (Int) + occupancy (Bool), column-side arrays
+        let sideTableSize = MemoryLayout<Store.Generational.Handle?>.stride
+        print("Bytes per slot (node stride + ledger + side table): \(nodeStride + ledgerSize + sideTableSize)")
         print("  node payload: \(nodeStride) bytes")
-        print("  meta overhead: \(metaSize) bytes")
-        //        print("  overhead ratio: \(String(format: "%.1f", Double(metaSize) / Double(nodeStride) * 100))%")
+        print("  column ledger: \(ledgerSize) bytes")
+        print("  position side table: \(sideTableSize) bytes")
     }
 
     // MARK: - Arena Growth

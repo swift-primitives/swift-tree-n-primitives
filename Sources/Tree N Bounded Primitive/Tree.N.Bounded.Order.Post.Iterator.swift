@@ -9,8 +9,10 @@
 //
 // ===----------------------------------------------------------------------===//
 
-internal import Buffer_Arena_Primitives
-public import Queue_Primitives
+public import Store_Primitive
+public import Storage_Generational_Primitives
+public import Shared_Primitive
+public import Stack_Primitive
 internal import Stack_Primitives
 internal import Iterator_Primitive
 internal import Iterator_Protocol
@@ -25,37 +27,39 @@ extension Tree.N.Bounded.Order.Post {
         let tree: Tree.N<n>.Bounded
 
         @usableFromInline
-        var pending: Stack<Index<Tree.N<n>.Node>>
+        var pending: Stack<Store.Generational.Handle>
 
         @usableFromInline
-        var lastVisited: Index<Tree.N<n>.Node>?
+        var lastVisited: Store.Generational.Handle?
 
         package init(tree: Tree.N<n>.Bounded) {
             self.tree = tree
-            self.pending = Stack<Index<Tree.N<n>.Node>>()
+            self.pending = Stack<Store.Generational.Handle>()
             self.lastVisited = nil
-            if let rootIndex = tree._rootIndex {
-                pending.push(rootIndex)
+
+            // Push root if exists
+            if let rootHandle = tree._rootHandle {
+                pending.push(rootHandle)
             }
         }
 
         @inlinable
         public mutating func next() -> Element? {
             while !pending.isEmpty {
-                let current = pending.peek()!
-                let childIndices = tree._arena[current].childIndices
+                let current = pending.peek { $0 }!
+                let childHandles = tree._storage.withColumn { $0[current].childHandles }
 
-                var rightmostChild: Index<Tree.N<n>.Node>? = nil
+                var rightmostChild: Store.Generational.Handle? = nil
                 for slot in stride(from: n - 1, through: 0, by: -1) {
-                    if let child = childIndices[slot] {
+                    if let child = childHandles[slot] {
                         rightmostChild = child
                         break
                     }
                 }
 
-                var leftmostChild: Index<Tree.N<n>.Node>? = nil
+                var leftmostChild: Store.Generational.Handle? = nil
                 for slot in 0..<n {
-                    if let child = childIndices[slot] {
+                    if let child = childHandles[slot] {
                         leftmostChild = child
                         break
                     }
@@ -68,10 +72,10 @@ extension Tree.N.Bounded.Order.Post {
                 if isLeaf || cameFromRightmost || cameFromLeftmostNoOther {
                     _ = pending.pop()
                     lastVisited = current
-                    return tree._arena[current].element
+                    return tree._storage.withColumn { $0[current].element }
                 } else {
                     for slot in stride(from: n - 1, through: 0, by: -1) {
-                        if let child = childIndices[slot] {
+                        if let child = childHandles[slot] {
                             pending.push(child)
                         }
                     }

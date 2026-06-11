@@ -23,7 +23,11 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/swift-primitives/swift-tree-primitives.git", branch: "main"),
-        .package(url: "https://github.com/swift-primitives/swift-buffer-arena-primitives.git", branch: "main"),
+        .package(url: "https://github.com/swift-primitives/swift-column-primitives.git", branch: "main"),
+        .package(url: "https://github.com/swift-primitives/swift-shared-primitives.git", branch: "main"),
+        .package(url: "https://github.com/swift-primitives/swift-storage-arena-primitives.git", branch: "main"),
+        .package(url: "https://github.com/swift-primitives/swift-store-primitives.git", branch: "main"),
+        .package(url: "https://github.com/swift-primitives/swift-buffer-ring-primitives.git", branch: "main"),
         .package(url: "https://github.com/swift-primitives/swift-buffer-primitives.git", branch: "main"),
         .package(url: "https://github.com/swift-primitives/swift-queue-primitives.git", branch: "main"),
         .package(url: "https://github.com/swift-primitives/swift-stack-primitives.git", branch: "main"),
@@ -38,12 +42,17 @@ let package = Package(
         // Base bounded-arity Tree.N + Tree.Binary (= Tree.N<2>): type + storage
         // (@usableFromInline internal) + all @inlinable ops + Order iterators +
         // Order.*.Sequence structs (conformances isolated in the ops module) +
-        // Copyable/Sendable markers (co-located per [MEM-COPY-006]). Arena-backed.
+        // Copyable/Sendable markers (co-located per [MEM-COPY-006]). Backed by the
+        // generational column (`Column.Generational<Node>` behind the `Shared` CoW box).
         .target(
             name: "Tree N Primitive",
             dependencies: [
                 .product(name: "Tree Primitives Core", package: "swift-tree-primitives"),
-                .product(name: "Buffer Arena Primitives", package: "swift-buffer-arena-primitives"),
+                .product(name: "Column Primitives", package: "swift-column-primitives"),
+                .product(name: "Shared Primitive", package: "swift-shared-primitives"),
+                .product(name: "Storage Generational Primitives", package: "swift-storage-arena-primitives"),
+                .product(name: "Store Primitive", package: "swift-store-primitives"),
+                .product(name: "Buffer Ring Primitive", package: "swift-buffer-ring-primitives"),
                 .product(name: "Index Primitives", package: "swift-index-primitives"),
                 .product(name: "Queue Primitives", package: "swift-queue-primitives"),
                 .product(name: "Stack Primitives", package: "swift-stack-primitives"),
@@ -57,7 +66,11 @@ let package = Package(
             name: "Tree N Bounded Primitive",
             dependencies: [
                 "Tree N Primitive",
-                .product(name: "Buffer Arena Primitives", package: "swift-buffer-arena-primitives"),
+                .product(name: "Column Primitives", package: "swift-column-primitives"),
+                .product(name: "Shared Primitive", package: "swift-shared-primitives"),
+                .product(name: "Storage Generational Primitives", package: "swift-storage-arena-primitives"),
+                .product(name: "Store Primitive", package: "swift-store-primitives"),
+                .product(name: "Buffer Ring Primitive", package: "swift-buffer-ring-primitives"),
                 .product(name: "Queue Primitives", package: "swift-queue-primitives"),
                 .product(name: "Stack Primitives", package: "swift-stack-primitives"),
                 .product(name: "Iterator Primitive", package: "swift-iterator-primitives"),

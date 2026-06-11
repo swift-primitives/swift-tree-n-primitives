@@ -9,6 +9,11 @@
 //
 // ===----------------------------------------------------------------------===//
 
+public import Store_Primitive
+public import Storage_Generational_Primitives
+public import Shared_Primitive
+public import Column_Primitives
+public import Buffer_Ring_Primitive
 public import Queue_Primitives
 internal import Iterator_Primitive
 internal import Iterator_Protocol
@@ -22,15 +27,18 @@ extension Tree.N.Order.Level {
         @usableFromInline
         let tree: Tree.N<n>
 
+        /// The pending-node FIFO on the `Shared` ring column — the CoW flavor is
+        /// required here (not the move-only direct ring) so the iterator struct
+        /// itself stays `Copyable`, preserving its pre-reshape shape.
         @usableFromInline
-        var pending: Queue<Index<Tree.N<n>.Node>>
+        var pending: Queue<Shared<Store.Generational.Handle, Column.Ring<Store.Generational.Handle>>>
 
         package init(tree: Tree.N<n>) {
             self.tree = tree
-            self.pending = Queue<Index<Tree.N<n>.Node>>()
+            self.pending = Queue<Shared<Store.Generational.Handle, Column.Ring<Store.Generational.Handle>>>()
 
-            if let rootIndex = tree._rootIndex {
-                pending.enqueue(rootIndex)
+            if let rootHandle = tree._rootHandle {
+                pending.enqueue(rootHandle)
             }
         }
 
@@ -38,12 +46,14 @@ extension Tree.N.Order.Level {
         public mutating func next() -> Element? {
             guard !pending.isEmpty else { return nil }
 
-            let index = pending.dequeue()!
-            let element = tree._arena[index].element
-            let childIndices = tree._arena[index].childIndices
+            let handle = pending.dequeue()!
+            let (element, childHandles) = tree._storage.withColumn {
+                (column) -> (Element, InlineArray<n, Store.Generational.Handle?>) in
+                (column[handle].element, column[handle].childHandles)
+            }
 
             for slot in 0..<n {
-                if let child = childIndices[slot] {
+                if let child = childHandles[slot] {
                     pending.enqueue(child)
                 }
             }
