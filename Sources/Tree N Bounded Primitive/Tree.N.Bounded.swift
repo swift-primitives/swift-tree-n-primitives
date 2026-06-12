@@ -62,10 +62,6 @@ extension Tree.N where Element: ~Copyable {
         @usableFromInline
         var _storage: Shared<Node, Column.Generational<Node>>
 
-        /// Slot → live handle side table for decoding public `Tree.Position` values.
-        @usableFromInline
-        var _handles: Swift.Array<Store.Generational.Handle?>
-
         /// Handle of root node (nil if empty).
         @usableFromInline
         var _rootHandle: Store.Generational.Handle?
@@ -84,9 +80,8 @@ extension Tree.N where Element: ~Copyable {
         @inlinable
         public init(capacity: Count) {
             self.capacity = capacity
-            let slots = Swift.max(Int(bitPattern: capacity), 1)
+            let slots = Index<Node>.Count(UInt(Swift.max(Int(bitPattern: capacity), 1)))
             self._storage = Shared(Column.Generational<Node>.create(slotCapacity: slots))
-            self._handles = Swift.Array(repeating: nil, count: slots)
             self._rootHandle = nil
         }
 
@@ -97,9 +92,8 @@ extension Tree.N where Element: ~Copyable {
         @inlinable
         public init(capacity: Count) where Element: Copyable {
             self.capacity = capacity
-            let slots = Swift.max(Int(bitPattern: capacity), 1)
+            let slots = Index<Node>.Count(UInt(Swift.max(Int(bitPattern: capacity), 1)))
             self._storage = Shared(Column.Generational<Node>.create(slotCapacity: slots))
-            self._handles = Swift.Array(repeating: nil, count: slots)
             self._rootHandle = nil
         }
 
@@ -133,16 +127,15 @@ extension Tree.N where Element: ~Copyable {
             Tree.Position(index: handle.index, token: UInt32(truncatingIfNeeded: handle.generation))
         }
 
-        /// Decodes a public position into the live handle for its slot.
+        /// Decodes a public position by RECONSTRUCTING the live handle from the
+        /// column's ledger (`handle(at:)` — Round M B2; no side table).
         @usableFromInline
         func _handle(_ position: Tree.Position) throws(__TreeNBoundedError) -> Store.Generational.Handle {
             let slot = Int(bitPattern: position.index)
             guard
                 slot >= 0,
-                slot < _handles.count,
-                let handle = _handles[slot],
-                UInt32(truncatingIfNeeded: handle.generation) == position.token,
-                _storage.withColumn({ $0.contains(handle) })
+                let handle = _storage.withColumn({ $0.handle(at: Index<Node>(Ordinal(UInt(slot)))) }),
+                UInt32(truncatingIfNeeded: handle.generation) == position.token
             else { throw .invalidPosition }
             return handle
         }
@@ -153,25 +146,21 @@ extension Tree.N where Element: ~Copyable {
             _ = try _handle(position)
         }
 
-        /// Inserts a node into the fixed column (callers pre-check fullness)
-        /// and records the minted handle in the side table.
+        /// Inserts a node into the fixed column (callers pre-check fullness).
         @inlinable
         mutating func _insert(node: consuming Node) -> Store.Generational.Handle {
-            let handle = _storage.withUnique(consuming: node) { (column, node) in
+            _storage.withUnique(consuming: node) { (column, node) in
                 column.insert(node)
             }
-            _handles[handle.index] = handle
-            return handle
         }
 
-        /// Removes the node at a live handle, clearing its side-table entry.
+        /// Removes the node at a live handle.
         @inlinable
         mutating func _remove(_ handle: Store.Generational.Handle) -> Node {
             guard let node = _storage.withUnique({ $0.remove(handle) }) else {
                 // Unreachable: callers pass decoded live handles and no removal interleaves.
                 preconditionFailure("Tree.N.Bounded: live handle failed to resolve on removal")
             }
-            _handles[handle.index] = nil
             return node
         }
 
@@ -368,9 +357,6 @@ extension Tree.N.Bounded where Element: ~Copyable {
     @inlinable
     public mutating func clear() {
         _storage.withUnique { $0.removeAll() }
-        for index in _handles.indices {
-            _handles[index] = nil
-        }
         _rootHandle = nil
     }
 

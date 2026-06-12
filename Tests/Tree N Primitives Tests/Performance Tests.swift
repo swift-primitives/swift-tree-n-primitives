@@ -410,16 +410,17 @@ struct TreeBinaryStatsTests {
         print("Tree<Int>.N<2>: size=\(MemoryLayout<Tree<Int>.N<2>>.size) stride=\(MemoryLayout<Tree<Int>.N<2>>.stride)")
         print("Tree<Int>.Binary.Bounded: size=\(MemoryLayout<Tree<Int>.Binary.Bounded>.size) stride=\(MemoryLayout<Tree<Int>.Binary.Bounded>.stride)")
 
-        // Bytes per node overhead: the generational column's per-slot ledger
-        // (generation Int + occupancy Bool in side arrays) plus the tree's
-        // slot → live-Handle decode table (~16 B/slot, the accepted tax).
+        // Bytes per node overhead post-Round-M: the generational column's fused
+        // parity-token ledger (ONE Int plane: token = generation<<1 | occupied)
+        // and NO tree-side decode table (B2 — positions reconstruct handles from
+        // the ledger via handle(at:); the former ~16-24 B/slot table is deleted).
         let nodeStride = MemoryLayout<Tree<Int>.N<2>.Node>.stride
-        let ledgerSize = 8 + 1  // generation (Int) + occupancy (Bool), column-side arrays
-        let sideTableSize = MemoryLayout<Store.Generational.Handle?>.stride
-        print("Bytes per slot (node stride + ledger + side table): \(nodeStride + ledgerSize + sideTableSize)")
+        let ledgerSize = 8  // the fused token plane (Int)
+        let retiredSideTable = MemoryLayout<Store.Generational.Handle?>.stride
+        print("Bytes per slot (node stride + fused ledger): \(nodeStride + ledgerSize)")
         print("  node payload: \(nodeStride) bytes")
-        print("  column ledger: \(ledgerSize) bytes")
-        print("  position side table: \(sideTableSize) bytes")
+        print("  column ledger (fused token plane): \(ledgerSize) bytes")
+        print("  retired position side table would have been: \(retiredSideTable) bytes")
     }
 
     // MARK: - Arena Growth
