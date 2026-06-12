@@ -258,53 +258,6 @@ struct TreeNBinaryTests {
     }
 }
 
-// MARK: - Tree.N<2>.Bounded Tests
-
-@Suite("Tree.N<2>.Bounded")
-struct TreeNBoundedTests {
-
-    @Test
-    func `Bounded initialization`() throws {
-        let tree = Tree<Int>.N<2>.Bounded(capacity: 10)
-        #expect(tree.isEmpty)
-        #expect(tree.count == 0)
-        #expect(tree.capacity == 10)
-        #expect(!tree.isFull)
-    }
-
-    @Test
-    func `Bounded insert and overflow`() throws {
-        var tree = Tree<Int>.N<2>.Bounded(capacity: 3)
-
-        let root = try tree.insert(1, at: .root)
-        _ = try tree.insert(2, at: .left(of: root))
-        _ = try tree.insert(3, at: .right(of: root))
-
-        #expect(tree.isFull)
-        #expect(tree.count == 3)
-
-        #expect(throws: __TreeNBoundedError.overflow) {
-            try tree.insert(4, at: .left(of: tree.left(of: root)!))
-        }
-    }
-
-    // NOTE: Negative capacity test removed — Count is unsigned (Cardinal-based),
-    // so negative values are prevented by the type system at compile time.
-
-    @Test
-    func `Bounded traversal`() throws {
-        var tree = Tree<Int>.N<2>.Bounded(capacity: 5)
-        let root = try tree.insert(1, at: .root)
-        let left = try tree.insert(2, at: .left(of: root))
-        _ = try tree.insert(3, at: .right(of: root))
-        _ = try tree.insert(4, at: .left(of: left))
-        _ = try tree.insert(5, at: .right(of: left))
-
-        expectEqual(tree.preOrder.collect(), 1, 2, 4, 5, 3)
-        expectEqual(tree.inOrder.collect(), 4, 2, 5, 1, 3)
-    }
-}
-
 // MARK: - NonCopyable Tests
 
 @Suite("Tree.N<2>.NonCopyable")
@@ -443,13 +396,6 @@ struct TreeNSendableTests {
         unsafe requireSendable(tree)
     }
 
-    @Test
-    func `Sendable bounded`() throws {
-        var tree = Tree<Int>.N<2>.Bounded(capacity: 10)
-        _ = try tree.insert(42, at: .root)
-
-        unsafe requireSendable(tree)
-    }
 }
 
 // MARK: - Token-Stamped Position Tests
@@ -574,25 +520,6 @@ struct TreeNStalePositionTests {
         // All original positions should still be valid
         #expect(tree.peek(at: root) == 1)
         #expect(tree.peek(at: positions[1]) != nil)
-    }
-
-    @Test
-    func `Bounded stale position detection`() throws {
-        var tree = Tree<Int>.N<2>.Bounded(capacity: 10)
-        let root = try tree.insert(1, at: .root)
-        let left = try tree.insert(2, at: .left(of: root))
-
-        // Remove left
-        _ = try tree.remove(at: left)
-
-        // Stale position should return nil
-        #expect(tree.peek(at: left) == nil)
-        #expect(tree.left(of: left) == nil)
-
-        // Insert at stale position should throw
-        #expect(throws: __TreeNBoundedError.invalidPosition) {
-            try tree.insert(3, at: .left(of: left))
-        }
     }
 
     @Test

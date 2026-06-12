@@ -14,10 +14,8 @@ let package = Package(
     products: [
         // MARK: - Type modules (lean ~Copyable types + storage-touching @inlinable ops, co-located per [MOD-036])
         .library(name: "Tree N Primitive", targets: ["Tree N Primitive"]),
-        .library(name: "Tree N Bounded Primitive", targets: ["Tree N Bounded Primitive"]),
         // MARK: - Ops modules (isolated Copyable conformances); `Tree N Primitives` doubles as the [MOD-005] umbrella
         .library(name: "Tree N Primitives", targets: ["Tree N Primitives"]),
-        .library(name: "Tree N Bounded Primitives", targets: ["Tree N Bounded Primitives"]),
         // MARK: - Test Support
         .library(name: "Tree N Primitives Test Support", targets: ["Tree N Primitives Test Support"]),
     ],
@@ -60,46 +58,11 @@ let package = Package(
                 .product(name: "Iterator Protocol", package: "swift-iterator-primitives"),
             ]
         ),
-        // Bounded capacity variant (fixed upfront allocation). Shares base Tree.N's
-        // Node/ChildSlot/InsertPosition → depends on `Tree N Primitive`.
-        .target(
-            name: "Tree N Bounded Primitive",
-            dependencies: [
-                "Tree N Primitive",
-                .product(name: "Column Primitives", package: "swift-column-primitives"),
-                .product(name: "Shared Primitive", package: "swift-shared-primitives"),
-                .product(name: "Storage Generational Primitives", package: "swift-storage-arena-primitives"),
-                .product(name: "Store Primitive", package: "swift-store-primitives"),
-                .product(name: "Buffer Ring Primitive", package: "swift-buffer-ring-primitives"),
-                .product(name: "Queue Primitives", package: "swift-queue-primitives"),
-                .product(name: "Stack Primitives", package: "swift-stack-primitives"),
-                .product(name: "Iterator Primitive", package: "swift-iterator-primitives"),
-                .product(name: "Iterator Protocol", package: "swift-iterator-primitives"),
-            ]
-        ),
-        // MARK: - Ops modules
-        // Base ops + umbrella ([MOD-005]/[MOD-036] base-plural-as-umbrella): isolated
-        // base Swift.Sequence conformances + re-export of base type and the Bounded variant ops.
-        // Acyclic: depends on the variant OPS modules, which depend on TYPE modules — never back.
+        // MARK: - Umbrella: base Swift.Sequence conformances + re-export of the base type.
         .target(
             name: "Tree N Primitives",
             dependencies: [
                 "Tree N Primitive",
-                "Tree N Bounded Primitives",
-                .product(name: "Iterable", package: "swift-iterator-primitives"),
-                .product(name: "Iterator Primitive", package: "swift-iterator-primitives"),
-                .product(name: "Iterator Chunk Primitives", package: "swift-iterator-primitives"),
-                .product(name: "Sequence Protocol Primitives", package: "swift-sequence-primitives"),
-            ]
-        ),
-        .target(
-            name: "Tree N Bounded Primitives",
-            dependencies: [
-                "Tree N Bounded Primitive",
-                .product(name: "Iterable", package: "swift-iterator-primitives"),
-                .product(name: "Iterator Primitive", package: "swift-iterator-primitives"),
-                .product(name: "Iterator Chunk Primitives", package: "swift-iterator-primitives"),
-                .product(name: "Sequence Protocol Primitives", package: "swift-sequence-primitives"),
             ]
         ),
 

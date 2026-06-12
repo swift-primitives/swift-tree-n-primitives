@@ -268,29 +268,6 @@ struct TreeBinaryPerformanceTests {
         #expect(tree2.count == 10_001)
     }
 
-    // MARK: - Bounded Performance
-
-    @Test
-    func `Bounded insert 10,000 nodes`() throws {
-        var tree = Tree<Int>.Binary.Bounded(capacity: 10_000)
-        var positions: [Tree<Int>.Position] = []
-        positions.reserveCapacity(10_000)
-
-        positions.append(try tree.insert(0, at: .root))
-        for i in 1..<10_000 {
-            let parentIndex = (i - 1) / 2
-            let parent = positions[parentIndex]
-            if i % 2 == 1 {
-                positions.append(try tree.insert(i, at: .left(of: parent)))
-            } else {
-                positions.append(try tree.insert(i, at: .right(of: parent)))
-            }
-        }
-
-        #expect(tree.count == 10_000)
-        #expect(tree.isFull)
-    }
-
     // MARK: - Memory Layout Verification
 
     @Test
@@ -408,7 +385,6 @@ struct TreeBinaryStatsTests {
         print("Store.Generational.Handle: size=\(MemoryLayout<Store.Generational.Handle>.size) stride=\(MemoryLayout<Store.Generational.Handle>.stride)")
 
         print("Tree<Int>.N<2>: size=\(MemoryLayout<Tree<Int>.N<2>>.size) stride=\(MemoryLayout<Tree<Int>.N<2>>.stride)")
-        print("Tree<Int>.Binary.Bounded: size=\(MemoryLayout<Tree<Int>.Binary.Bounded>.size) stride=\(MemoryLayout<Tree<Int>.Binary.Bounded>.stride)")
 
         // Bytes per node overhead post-Round-M: the generational column's fused
         // parity-token ledger (ONE Int plane: token = generation<<1 | occupied)
@@ -588,27 +564,9 @@ struct TreeBinaryStatsTests {
             }
         }
 
-        // Bounded
-        let boundedTime = try clock.measure {
-            var tree = Tree<Int>.Binary.Bounded(capacity: 10_000)
-            var positions: [Tree<Int>.Position] = []
-            positions.reserveCapacity(nodeCount)
-            positions.append(try tree.insert(0, at: .root))
-            for i in 1..<nodeCount {
-                let parentIndex = (i - 1) / 2
-                let parent = positions[parentIndex]
-                if i % 2 == 1 {
-                    positions.append(try tree.insert(i, at: .left(of: parent)))
-                } else {
-                    positions.append(try tree.insert(i, at: .right(of: parent)))
-                }
-            }
-        }
-
         print("=== Timed Insert (\(nodeCount) nodes) ===")
         print("Growable (no reserve): \(growableTime)")
         print("Pre-reserved:          \(preReservedTime)")
-        print("Bounded:               \(boundedTime)")
     }
 
     @Test
@@ -724,25 +682,8 @@ struct TreeBinaryStatsTests {
             }
         }
 
-        // Tree.N.Bounded
-        let boundedTime = try clock.measure {
-            var tree = Tree<Int>.Binary.Bounded(capacity: 128)
-            var positions: [Tree<Int>.Position] = []
-            positions.reserveCapacity(nodeCount)
-            positions.append(try tree.insert(0, at: .root))
-            for i in 1..<nodeCount {
-                let p = (i - 1) / 2
-                if i % 2 == 1 {
-                    positions.append(try tree.insert(i, at: .left(of: positions[p])))
-                } else {
-                    positions.append(try tree.insert(i, at: .right(of: positions[p])))
-                }
-            }
-        }
-
         print("=== Variant Comparison (\(nodeCount) node complete binary tree) ===")
         print("Tree.N (growable):   \(growableTime)")
-        print("Tree.N.Bounded:      \(boundedTime)")
     }
 
     // MARK: - CoW Cost

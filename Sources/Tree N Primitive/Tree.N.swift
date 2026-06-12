@@ -86,6 +86,10 @@ public import Stack_Primitives
 /// which retires the old pool wholesale and continues the incarnation history
 /// index-aligned — outstanding positions survive growth.
 ///
+/// The former `Bounded` variant is DISSOLVED (Round M coda — the variant-
+/// dissolution doctrine): bounded capacity returns column-composed,
+/// consumer-pulled, at its round — not as a rebuilt variant nest.
+///
 /// Public `Tree.Position` tokens project the slot's generation into `UInt32`
 /// (`UInt32(truncatingIfNeeded:)`): a token wraps after 2^32 frees of one slot
 /// — equivalent to the retired arena's UInt32 token wrap.

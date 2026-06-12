@@ -5,4 +5,3 @@
 // whole bounded-arity tree discipline.
 
 @_exported public import Tree_N_Primitive
-@_exported public import Tree_N_Bounded_Primitives
