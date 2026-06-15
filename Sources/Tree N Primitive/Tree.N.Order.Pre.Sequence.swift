@@ -16,6 +16,7 @@ extension Tree.N.Order.Pre {
     /// A sequence that yields elements in pre-order traversal.
     ///
     /// Pre-order traversal visits the root first, then children left-to-right.
+    @frozen
     public struct Sequence {
         package let tree: Tree.N<n>
     }

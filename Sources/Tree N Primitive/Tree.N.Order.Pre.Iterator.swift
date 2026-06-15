@@ -9,13 +9,13 @@
 //
 // ===----------------------------------------------------------------------===//
 
-public import Store_Primitive
-public import Storage_Generational_Primitives
-public import Shared_Primitive
-public import Stack_Primitive
-internal import Stack_Primitives
 internal import Iterator_Primitive
 internal import Iterator_Protocol
+public import Stack_Primitive
+internal import Stack_Primitives
+public import Storage_Generational_Primitives
+public import Store_Primitive
+public import Tree_Primitives_Core
 
 // MARK: - Pre-Order Iterator
 
@@ -42,10 +42,8 @@ extension Tree.N.Order.Pre {
             guard !pending.isEmpty else { return nil }
 
             let handle = pending.pop()!
-            let (element, childHandles) = tree._storage.withColumn {
-                (column) -> (Element, InlineArray<n, Store.Generational.Handle?>) in
-                (column[handle].element, column[handle].childHandles)
-            }
+            let element = tree._storage.withElement(at: handle) { $0 }
+            let childHandles = tree._storage.withLinks(at: handle) { $0 }
 
             for slot in stride(from: n - 1, through: 0, by: -1) {
                 if let child = childHandles[slot] {

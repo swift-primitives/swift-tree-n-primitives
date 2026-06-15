@@ -9,109 +9,90 @@
 //
 // ===----------------------------------------------------------------------===//
 
-// MARK: - Hoisted InsertPosition Type (Module Level)
-//
-// Swift does not allow nested types with value generic parameters inside
-// generic types to be easily accessed. `InsertPosition` is hoisted to module
-// level and exposed via typealias to provide the expected Nest.Name API.
-//
-// This is a documented exception per [API-EXC-001] due to Swift language
-// limitations with generic nested types containing value generics.
-//
-// Use the typealias form in your code: Tree<Element>.N<n>.InsertPosition
+public import Tree_Primitives_Core
 
-/// Hoisted implementation of ``Tree/N/InsertPosition``.
-///
-/// Specifies where to insert a new node in an n-ary tree.
-///
-/// ## No appendChild
-///
-/// Per [TREE-010], `Tree<Element>.N<n>` does not provide `.appendChild(of:)` -
-/// only explicit `.child(of:slot:)`. This keeps bounded-arity semantics honest
-/// (no implicit slot selection).
-///
-/// - Note: Use ``Tree/N/InsertPosition`` in your code, not this type directly.
-public enum __TreeNInsertPosition<let n: Int>: Sendable, Equatable {
-    /// Insert as the root of the tree.
-    case root
-
-    /// Insert as a child of the given position at the specified slot.
-    ///
-    /// - Parameters:
-    ///   - position: The parent position.
-    ///   - slot: The child slot index (0..<n).
-    case child(of: __TreePosition, slot: __TreeNChildSlot<n>)
-}
+// MARK: - N-ary InsertPosition convenience factories
+//
+// The bounded-arity tree's insert position IS the shared
+// ``Tree/Protocol/InsertPosition`` (`__TreeInsertPosition<Address>` with
+// `Address == __TreeNChildSlot<n>`), surfaced per conformer by the
+// `Tree.Protocol` extension. There is no n-ary-specific insert-position type —
+// only the arity-specific convenience factories below, which name child slots
+// positionally and forward to `.child(of:at:)`.
+//
+// Per [TREE-010], `Tree<Element>.N<n>` provides no `.appendChild(of:)` — only the
+// explicit slot factories — keeping bounded-arity semantics honest (no implicit
+// slot selection).
 
 // MARK: - Binary Tree Convenience (n == 2)
 
-extension __TreeNInsertPosition where n == 2 {
+extension __TreeInsertPosition where Address == __TreeNChildSlot<2> {
 
     /// Insert as the left child of the given position.
     ///
-    /// Convenience for `.child(of: position, slot: .left)`.
+    /// Convenience for `.child(of: position, at: .left)`.
     @inlinable
     public static func left(of position: __TreePosition) -> Self {
-        .child(of: position, slot: .left)
+        .child(of: position, at: .left)
     }
 
     /// Insert as the right child of the given position.
     ///
-    /// Convenience for `.child(of: position, slot: .right)`.
+    /// Convenience for `.child(of: position, at: .right)`.
     @inlinable
     public static func right(of position: __TreePosition) -> Self {
-        .child(of: position, slot: .right)
+        .child(of: position, at: .right)
     }
 }
 
 // MARK: - Ternary Tree Convenience (n == 3)
 
-extension __TreeNInsertPosition where n == 3 {
+extension __TreeInsertPosition where Address == __TreeNChildSlot<3> {
 
     /// Insert as the left child of the given position.
     @inlinable
     public static func left(of position: __TreePosition) -> Self {
-        .child(of: position, slot: .left)
+        .child(of: position, at: .left)
     }
 
     /// Insert as the middle child of the given position.
     @inlinable
     public static func middle(of position: __TreePosition) -> Self {
-        .child(of: position, slot: .middle)
+        .child(of: position, at: .middle)
     }
 
     /// Insert as the right child of the given position.
     @inlinable
     public static func right(of position: __TreePosition) -> Self {
-        .child(of: position, slot: .right)
+        .child(of: position, at: .right)
     }
 }
 
 // MARK: - Quad Tree Convenience (n == 4)
 
-extension __TreeNInsertPosition where n == 4 {
+extension __TreeInsertPosition where Address == __TreeNChildSlot<4> {
 
     /// Insert as the northwest child of the given position.
     @inlinable
     public static func northwest(of position: __TreePosition) -> Self {
-        .child(of: position, slot: .northwest)
+        .child(of: position, at: .northwest)
     }
 
     /// Insert as the northeast child of the given position.
     @inlinable
     public static func northeast(of position: __TreePosition) -> Self {
-        .child(of: position, slot: .northeast)
+        .child(of: position, at: .northeast)
     }
 
     /// Insert as the southwest child of the given position.
     @inlinable
     public static func southwest(of position: __TreePosition) -> Self {
-        .child(of: position, slot: .southwest)
+        .child(of: position, at: .southwest)
     }
 
     /// Insert as the southeast child of the given position.
     @inlinable
     public static func southeast(of position: __TreePosition) -> Self {
-        .child(of: position, slot: .southeast)
+        .child(of: position, at: .southeast)
     }
 }

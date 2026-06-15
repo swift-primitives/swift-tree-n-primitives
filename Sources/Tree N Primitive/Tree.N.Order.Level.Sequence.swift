@@ -14,6 +14,7 @@
 extension Tree.N.Order.Level {
 
     /// A sequence that yields elements in level-order (breadth-first) traversal.
+    @frozen
     public struct Sequence {
         package let tree: Tree.N<n>
     }

@@ -9,14 +9,15 @@
 //
 // ===----------------------------------------------------------------------===//
 
-public import Store_Primitive
-public import Storage_Generational_Primitives
-public import Shared_Primitive
-public import Column_Primitives
 public import Buffer_Ring_Primitive
-public import Queue_Primitives
+public import Column_Primitives
 internal import Iterator_Primitive
 internal import Iterator_Protocol
+public import Queue_Primitives
+public import Shared_Primitive
+public import Storage_Generational_Primitives
+public import Store_Primitive
+public import Tree_Primitives_Core
 
 // MARK: - Level-Order Iterator
 
@@ -47,10 +48,8 @@ extension Tree.N.Order.Level {
             guard !pending.isEmpty else { return nil }
 
             let handle = pending.dequeue()!
-            let (element, childHandles) = tree._storage.withColumn {
-                (column) -> (Element, InlineArray<n, Store.Generational.Handle?>) in
-                (column[handle].element, column[handle].childHandles)
-            }
+            let element = tree._storage.withElement(at: handle) { $0 }
+            let childHandles = tree._storage.withLinks(at: handle) { $0 }
 
             for slot in 0..<n {
                 if let child = childHandles[slot] {

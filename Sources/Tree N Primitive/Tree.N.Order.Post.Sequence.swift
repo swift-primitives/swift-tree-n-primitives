@@ -16,6 +16,7 @@ extension Tree.N.Order.Post {
     /// A sequence that yields elements in post-order traversal.
     ///
     /// Post-order traversal visits children left-to-right, then the root.
+    @frozen
     public struct Sequence {
         package let tree: Tree.N<n>
     }

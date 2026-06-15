@@ -9,13 +9,13 @@
 //
 // ===----------------------------------------------------------------------===//
 
-public import Store_Primitive
-public import Storage_Generational_Primitives
-public import Shared_Primitive
-public import Stack_Primitive
-internal import Stack_Primitives
 internal import Iterator_Primitive
 internal import Iterator_Protocol
+public import Stack_Primitive
+internal import Stack_Primitives
+public import Storage_Generational_Primitives
+public import Store_Primitive
+public import Tree_Primitives_Core
 
 // MARK: - Post-Order Iterator
 
@@ -47,7 +47,7 @@ extension Tree.N.Order.Post {
         public mutating func next() -> Element? {
             while !pending.isEmpty {
                 let current = pending.peek { $0 }!
-                let childHandles = tree._storage.withColumn { $0[current].childHandles }
+                let childHandles = tree._storage.withLinks(at: current) { $0 }
 
                 var rightmostChild: Store.Generational.Handle? = nil
                 for slot in stride(from: n - 1, through: 0, by: -1) {
@@ -72,7 +72,7 @@ extension Tree.N.Order.Post {
                 if isLeaf || cameFromRightmost || cameFromLeftmostNoOther {
                     _ = pending.pop()
                     lastVisited = current
-                    return tree._storage.withColumn { $0[current].element }
+                    return tree._storage.withElement(at: current) { $0 }
                 } else {
                     for slot in stride(from: n - 1, through: 0, by: -1) {
                         if let child = childHandles[slot] {

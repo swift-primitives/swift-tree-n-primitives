@@ -17,6 +17,7 @@ extension Tree.N.Order.In {
     ///
     /// In-order traversal visits left subtree, then root, then right subtree.
     /// Only available for binary trees (n == 2).
+    @frozen
     public struct Sequence {
         package let tree: Tree.N<n>
     }

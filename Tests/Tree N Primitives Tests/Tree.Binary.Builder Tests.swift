@@ -212,7 +212,7 @@ extension TreeBinaryBuilderTests.Integration {
         }
         // Find root and add a left-child to node 2 (which is at .left(of: root))
         let root = tree.root!
-        let leftOfRoot = tree.child(of: root, slot: .left)!
+        let leftOfRoot = tree.child(of: root, at: .left)!
         try tree.insert(99, at: .left(of: leftOfRoot))
         #expect(tree.count == 4)
     }

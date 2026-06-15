@@ -272,23 +272,23 @@ struct TreeBinaryPerformanceTests {
 
     @Test
     func `Memory layout sizes`() {
-        // Verify struct sizes are reasonable
+        // The per-node arena slot is now a tree-core-internal detail (`__TreeNode`):
+        // the public layout facts are the position and the tree handle (a `Shared`
+        // CoW box pointer + the root handle — the node payload lives in the arena).
         let positionSize = MemoryLayout<Tree<Int>.Position>.size
-        let nodeSize = MemoryLayout<Tree<Int>.N<2>.Node>.size
+        let treeSize = MemoryLayout<Tree<Int>.N<2>>.size
 
-        // Position should be compact (index + token)
+        // Position should be compact (index + token).
         #expect(positionSize <= 16)  // Int + UInt32 + padding
 
-        // Node should contain element + InlineArray<n, Handle?> + childCount + parentHandle.
-        // Generational handles are (index, generation) Int pairs (16 B vs the retired
-        // arena's 8 B indices), so the n=2 node grows accordingly.
-        #expect(nodeSize <= 128)  // Int element + optional handles + count + padding
+        // The tree handle is a refcounted box pointer plus the root handle.
+        #expect(treeSize <= 64)
 
-        // Print for manual inspection
+        // Print for manual inspection.
         print("Position size: \(positionSize) bytes")
-        print("Node size: \(nodeSize) bytes")
+        print("Tree handle size: \(treeSize) bytes")
         print("Position stride: \(MemoryLayout<Tree<Int>.Position>.stride) bytes")
-        print("Node stride: \(MemoryLayout<Tree<Int>.N<2>.Node>.stride) bytes")
+        print("Tree handle stride: \(MemoryLayout<Tree<Int>.N<2>>.stride) bytes")
     }
 
     // MARK: - Token Validation Performance
@@ -374,29 +374,21 @@ struct TreeBinaryStatsTests {
     func `Memory layout report`() {
         print("=== Memory Layout ===")
 
+        // The per-node arena slot (element + sparse `InlineArray<n, Handle?>` links +
+        // parent handle) is now a tree-core-internal detail (`__TreeNode`), not a
+        // public type. The public layout facts are the position and the tree handle
+        // (a `Shared` CoW box pointer + the root handle — independent of arity and
+        // element, which live in the arena).
         print("Tree<Int>.Position: size=\(MemoryLayout<Tree<Int>.Position>.size) stride=\(MemoryLayout<Tree<Int>.Position>.stride) align=\(MemoryLayout<Tree<Int>.Position>.alignment)")
-
-        print("Tree<Int>.N<2>.Node: size=\(MemoryLayout<Tree<Int>.N<2>.Node>.size) stride=\(MemoryLayout<Tree<Int>.N<2>.Node>.stride) align=\(MemoryLayout<Tree<Int>.N<2>.Node>.alignment)")
-        print("Tree<Int>.N<4>.Node: size=\(MemoryLayout<Tree<Int>.N<4>.Node>.size) stride=\(MemoryLayout<Tree<Int>.N<4>.Node>.stride) align=\(MemoryLayout<Tree<Int>.N<4>.Node>.alignment)")
-        print("Tree<Int>.N<8>.Node: size=\(MemoryLayout<Tree<Int>.N<8>.Node>.size) stride=\(MemoryLayout<Tree<Int>.N<8>.Node>.stride) align=\(MemoryLayout<Tree<Int>.N<8>.Node>.alignment)")
-
-        print("Tree<String>.N<2>.Node: size=\(MemoryLayout<Tree<String>.N<2>.Node>.size) stride=\(MemoryLayout<Tree<String>.N<2>.Node>.stride)")
-
+        print("Tree<Int>.N<2> (handle): size=\(MemoryLayout<Tree<Int>.N<2>>.size) stride=\(MemoryLayout<Tree<Int>.N<2>>.stride)")
         print("Store.Generational.Handle: size=\(MemoryLayout<Store.Generational.Handle>.size) stride=\(MemoryLayout<Store.Generational.Handle>.stride)")
 
-        print("Tree<Int>.N<2>: size=\(MemoryLayout<Tree<Int>.N<2>>.size) stride=\(MemoryLayout<Tree<Int>.N<2>>.stride)")
-
-        // Bytes per node overhead post-Round-M: the generational column's fused
-        // parity-token ledger (ONE Int plane: token = generation<<1 | occupied)
-        // and NO tree-side decode table (B2 — positions reconstruct handles from
-        // the ledger via handle(at:); the former ~16-24 B/slot table is deleted).
-        let nodeStride = MemoryLayout<Tree<Int>.N<2>.Node>.stride
-        let ledgerSize = 8  // the fused token plane (Int)
+        // Column overhead post-Round-M: the generational column's fused parity-token
+        // ledger (ONE Int plane: token = generation<<1 | occupied) and NO tree-side
+        // decode table (B2 — positions reconstruct handles from the ledger via
+        // handle(at:); the former ~16-24 B/slot table is deleted).
         let retiredSideTable = MemoryLayout<Store.Generational.Handle?>.stride
-        print("Bytes per slot (node stride + fused ledger): \(nodeStride + ledgerSize)")
-        print("  node payload: \(nodeStride) bytes")
-        print("  column ledger (fused token plane): \(ledgerSize) bytes")
-        print("  retired position side table would have been: \(retiredSideTable) bytes")
+        print("Retired position side table would have been: \(retiredSideTable) bytes/slot")
     }
 
     // MARK: - Arena Growth

@@ -37,11 +37,12 @@ let package = Package(
     targets: [
 
         // MARK: - Type modules
-        // Base bounded-arity Tree.N + Tree.Binary (= Tree.N<2>): type + storage
-        // (@usableFromInline internal) + all @inlinable ops + Order iterators +
-        // Order.*.Sequence structs (conformances isolated in the ops module) +
-        // Copyable/Sendable markers (co-located per [MEM-COPY-006]). Backed by the
-        // generational column (`Column.Generational<Node>` behind the `Shared` CoW box).
+        // Base bounded-arity Tree.N + Tree.Binary (= Tree.N<2>): the lean
+        // `Tree.Protocol` conformer (sparse `InlineArray<n, Handle?>` child links +
+        // its six link witnesses) over the shared `Tree.Storage` arena, plus the
+        // Order iterators + Order.*.Sequence structs (conformances isolated in the
+        // umbrella) + Copyable/Sendable markers (co-located per [MEM-COPY-006]). The
+        // generational column, decode, and shared ops live in `Tree Primitives Core`.
         .target(
             name: "Tree N Primitive",
             dependencies: [
@@ -53,6 +54,7 @@ let package = Package(
                 .product(name: "Buffer Ring Primitive", package: "swift-buffer-ring-primitives"),
                 .product(name: "Index Primitives", package: "swift-index-primitives"),
                 .product(name: "Queue Primitives", package: "swift-queue-primitives"),
+                .product(name: "Stack Primitive", package: "swift-stack-primitives"),
                 .product(name: "Stack Primitives", package: "swift-stack-primitives"),
                 .product(name: "Iterator Primitive", package: "swift-iterator-primitives"),
                 .product(name: "Iterator Protocol", package: "swift-iterator-primitives"),
@@ -63,6 +65,10 @@ let package = Package(
             name: "Tree N Primitives",
             dependencies: [
                 "Tree N Primitive",
+                .product(name: "Iterable", package: "swift-iterator-primitives"),
+                .product(name: "Iterator Primitive", package: "swift-iterator-primitives"),
+                .product(name: "Iterator Chunk Primitives", package: "swift-iterator-primitives"),
+                .product(name: "Sequence Protocol Primitives", package: "swift-sequence-primitives"),
             ]
         ),
 

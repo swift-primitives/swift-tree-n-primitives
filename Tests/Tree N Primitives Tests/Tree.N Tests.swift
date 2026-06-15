@@ -83,7 +83,9 @@ struct TreeNBinaryTests {
         var tree = Tree<Int>.N<2>()
         _ = try tree.insert(1, at: .root)
 
-        #expect(throws: __TreeNError.slotOccupied) {
+        // Root-occupied now refines to `.rootOccupied` (the shared insert default),
+        // distinct from a child `.slotOccupied` (W1-flagged refinement).
+        #expect(throws: __TreeError.rootOccupied) {
             try tree.insert(2, at: .root)
         }
     }
@@ -94,7 +96,7 @@ struct TreeNBinaryTests {
         let root = try tree.insert(1, at: .root)
         _ = try tree.insert(2, at: .left(of: root))
 
-        #expect(throws: __TreeNError.slotOccupied) {
+        #expect(throws: __TreeError.slotOccupied) {
             try tree.insert(3, at: .left(of: root))
         }
     }
@@ -117,7 +119,7 @@ struct TreeNBinaryTests {
         let root = try tree.insert(1, at: .root)
         _ = try tree.insert(2, at: .left(of: root))
 
-        #expect(throws: __TreeNError.cannotRemoveNonLeaf) {
+        #expect(throws: __TreeError.cannotRemoveNonLeaf) {
             try tree.remove(at: root)
         }
     }
@@ -393,7 +395,9 @@ struct TreeNSendableTests {
         let root = try tree.insert(42, at: .root)
         _ = try tree.insert(1, at: .left(of: root))
 
-        unsafe requireSendable(tree)
+        // Proper conditional Sendable (no `@unchecked`/`@unsafe`): the call needs no
+        // `unsafe` marker.
+        requireSendable(tree)
     }
 
 }
@@ -432,10 +436,10 @@ struct TreeNStalePositionTests {
         _ = try tree.remove(at: left)
 
         // Inserting at a stale position should throw
-        #expect(throws: __TreeNError.invalidPosition) {
+        #expect(throws: __TreeError.invalidPosition) {
             try tree.insert(4, at: .left(of: left))
         }
-        #expect(throws: __TreeNError.invalidPosition) {
+        #expect(throws: __TreeError.invalidPosition) {
             try tree.insert(5, at: .right(of: left))
         }
     }
