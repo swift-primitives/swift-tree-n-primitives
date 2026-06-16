@@ -26,8 +26,8 @@ public import Tree_Primitives_Core
 /// position-survives-growth contract, and the shared insert / remove / navigation /
 /// traversal algorithms live in ``Tree/Storage`` + the ``Tree/Protocol`` defaults.
 /// This type supplies the sparse `InlineArray<n, Handle?>` child-link representation
-/// and its six link witnesses; the binary `left`/`right` and in-order surface ride
-/// the shared `child(of:at:)`.
+/// and its six link witnesses; the binary `left`/`right` ride the shared `child`
+/// navigation, and in-order traversal is the `forEach.inOrder` accessor.
 ///
 /// ## Example
 ///
@@ -147,16 +147,9 @@ extension Tree where Element: ~Copyable {
         @inlinable
         public var count: Count { _storage.count }
 
-        /// The number of occupied child slots of the node at `position`, or `nil` if
-        /// the position is invalid.
-        ///
-        /// Typed as `Int?`: a bounded ``ChildSlot`` is not an `Index`, so it carries
-        /// no `.Count` domain — the occupied-slot tally is a plain `0...n` integer.
-        @inlinable
-        public func childCount(of position: Tree.Position) -> Int? {
-            guard let handle = _liveHandle(position) else { return nil }
-            return _childCount(at: handle)
-        }
+        // The per-node child count is the shared `tree.child.count(of:)` view member
+        // (R1 W4 [API-NAME-002]; tree-core `__TreeChild.swift`) — `Int?`, matching the
+        // bounded-slot tally; the compound `childCount(of:)` was folded into `child`.
 
         // MARK: - Arena requirements (delegated to the private Tree.Storage)
 
@@ -293,70 +286,23 @@ extension Tree.N where Element: ~Copyable, n == 2 {
     /// position is invalid.
     @inlinable
     public func left(of position: Tree.Position) -> Tree.Position? {
-        child(of: position, at: .left)
+        _child(of: position, at: .left)
     }
 
     /// The position of the right child, or `nil` if there is no right child / the
     /// position is invalid.
     @inlinable
     public func right(of position: Tree.Position) -> Tree.Position? {
-        child(of: position, at: .right)
+        _child(of: position, at: .right)
     }
 }
 
-// MARK: - Leftmost / Rightmost Child (sparse scan over the shared `child(of:at:)`)
-
-extension Tree.N where Element: ~Copyable {
-
-    /// The position of the leftmost (first non-empty) child, or `nil` if none.
-    @inlinable
-    public func leftmostChild(of position: Tree.Position) -> Tree.Position? {
-        for slot in 0..<n {
-            if let childSlot = ChildSlot(slot), let child = child(of: position, at: childSlot) {
-                return child
-            }
-        }
-        return nil
-    }
-
-    /// The position of the rightmost (last non-empty) child, or `nil` if none.
-    @inlinable
-    public func rightmostChild(of position: Tree.Position) -> Tree.Position? {
-        for slot in stride(from: n - 1, through: 0, by: -1) {
-            if let childSlot = ChildSlot(slot), let child = child(of: position, at: childSlot) {
-                return child
-            }
-        }
-        return nil
-    }
-}
-
-// MARK: - Binary Tree In-Order Traversal (n == 2; over the arena witnesses)
-
-extension Tree.N where Element: ~Copyable, n == 2 {
-
-    /// Iterates over all elements in in-order (left subtree, root, right subtree).
-    ///
-    /// Only available for binary trees (n == 2). Iterative (deep-tree safe).
-    @inlinable
-    public func forEachInOrder(_ body: (borrowing Element) -> Void) {
-        guard let rootHandle = _rootHandle else { return }
-        var pending = Stack<Store.Generational.Handle>()
-        var current: Store.Generational.Handle? = rootHandle
-
-        while current != nil || !pending.isEmpty {
-            // Go to leftmost node.
-            while let c = current {
-                pending.push(c)
-                current = _childHandle(at: c, address: .left)
-            }
-            // Process node, then move to its right subtree.
-            let c = pending.pop()!
-            _withElement(at: c) { body($0) }
-            current = _childHandle(at: c, address: .right)
-        }
-    }
-}
+// MARK: - Folded into fluent accessors (R1 W4 [API-NAME-002])
+//
+// `leftmostChild` / `rightmostChild` → the shared `tree.child.leftmost(of:)` /
+// `.rightmost(of:)` view members (tree-core `__TreeChild.swift`, generalized to
+// first/last child of any ordered tree). `forEachInOrder` → `tree.forEach.inOrder { }`
+// (binary only) in `Tree.N.ForEach.swift`.
 
 // MARK: - Conditional Copyable (CoW; rides the `Tree.Storage` Copyable twin)
 

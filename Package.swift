@@ -33,6 +33,8 @@ let package = Package(
         .package(url: "https://github.com/swift-primitives/swift-array-primitives.git", branch: "main"),
         .package(url: "https://github.com/swift-primitives/swift-iterator-primitives.git", branch: "main"),
         .package(url: "https://github.com/swift-primitives/swift-sequence-primitives.git", branch: "main"),
+        // R1 W4: forEach.inOrder fluent accessor via Property<Tag,Base>.Borrow.
+        .package(url: "https://github.com/swift-primitives/swift-property-primitives.git", branch: "main"),
     ],
     targets: [
 
@@ -58,6 +60,7 @@ let package = Package(
                 .product(name: "Stack Primitives", package: "swift-stack-primitives"),
                 .product(name: "Iterator Primitive", package: "swift-iterator-primitives"),
                 .product(name: "Iterator Protocol", package: "swift-iterator-primitives"),
+                .product(name: "Property Primitives", package: "swift-property-primitives"),
             ]
         ),
         // MARK: - Umbrella: base Swift.Sequence conformances + re-export of the base type.

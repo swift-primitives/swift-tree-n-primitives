@@ -33,7 +33,7 @@ extension TreeBinaryBuilderTests {
         _ tree: borrowing Tree<Int>.Binary
     ) -> [Int] {
         var result: [Int] = []
-        tree.forEachInOrder { result.append($0) }
+        tree.forEach.inOrder { result.append($0) }
         return result
     }
 
@@ -42,7 +42,7 @@ extension TreeBinaryBuilderTests {
         _ tree: borrowing Tree<Int>.Binary
     ) -> [Int] {
         var result: [Int] = []
-        tree.forEachPreOrder { result.append($0) }
+        tree.forEach.preOrder { result.append($0) }
         return result
     }
 }
@@ -212,7 +212,7 @@ extension TreeBinaryBuilderTests.Integration {
         }
         // Find root and add a left-child to node 2 (which is at .left(of: root))
         let root = tree.root!
-        let leftOfRoot = tree.child(of: root, at: .left)!
+        let leftOfRoot = tree.child.at(.left, of: root)!
         try tree.insert(99, at: .left(of: leftOfRoot))
         #expect(tree.count == 4)
     }

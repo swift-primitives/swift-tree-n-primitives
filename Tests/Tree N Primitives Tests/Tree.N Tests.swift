@@ -163,7 +163,7 @@ struct TreeNBinaryTests {
         _ = try tree.insert(5, at: .right(of: left))
 
         var result = [Int]()
-        tree.forEachPreOrder { result.append($0) }
+        tree.forEach.preOrder { result.append($0) }
         expectEqual(result, 1, 2, 4, 5, 3)
     }
 
@@ -177,7 +177,7 @@ struct TreeNBinaryTests {
         _ = try tree.insert(5, at: .right(of: left))
 
         var result = [Int]()
-        tree.forEachInOrder { result.append($0) }
+        tree.forEach.inOrder { result.append($0) }
         expectEqual(result, 4, 2, 5, 1, 3)
     }
 
@@ -191,7 +191,7 @@ struct TreeNBinaryTests {
         _ = try tree.insert(5, at: .right(of: left))
 
         var result = [Int]()
-        tree.forEachPostOrder { result.append($0) }
+        tree.forEach.postOrder { result.append($0) }
         expectEqual(result, 4, 5, 2, 3, 1)
     }
 
@@ -205,7 +205,7 @@ struct TreeNBinaryTests {
         _ = try tree.insert(5, at: .right(of: left))
 
         var result = [Int]()
-        tree.forEachLevelOrder { result.append($0) }
+        tree.forEach.levelOrder { result.append($0) }
         expectEqual(result, 1, 2, 3, 4, 5)
     }
 
@@ -341,7 +341,7 @@ struct TreeNNonCopyableTests {
         _ = try tree.insert(Token(3, tracker: tracker), at: .right(of: root))
 
         var values = [Int]()
-        tree.forEachPreOrder { token in
+        tree.forEach.preOrder { token in
             values.append(token.value)
         }
         expectEqual(values, 1, 2, 3)

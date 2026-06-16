@@ -34,13 +34,13 @@ private typealias BNode = Tree<Int>.N<2>.Nested.Node
 extension TreeBinaryNestedBuilderTests {
     fileprivate static func preOrder(_ tree: borrowing Tree<Int>.N<2>) -> [Int] {
         var result: [Int] = []
-        tree.forEachPreOrder { result.append($0) }
+        tree.forEach.preOrder { result.append($0) }
         return result
     }
 
     fileprivate static func inOrder(_ tree: borrowing Tree<Int>.N<2>) -> [Int] {
         var result: [Int] = []
-        tree.forEachInOrder { result.append($0) }
+        tree.forEach.inOrder { result.append($0) }
         return result
     }
 }

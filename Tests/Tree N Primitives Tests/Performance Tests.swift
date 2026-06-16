@@ -119,7 +119,7 @@ struct TreeBinaryPerformanceTests {
         }
 
         var count = 0
-        tree.forEachPreOrder { _ in count += 1 }
+        tree.forEach.preOrder { _ in count += 1 }
         #expect(count == 10_000)
     }
 
@@ -141,7 +141,7 @@ struct TreeBinaryPerformanceTests {
         }
 
         var count = 0
-        tree.forEachInOrder { _ in count += 1 }
+        tree.forEach.inOrder { _ in count += 1 }
         #expect(count == 10_000)
     }
 
@@ -163,7 +163,7 @@ struct TreeBinaryPerformanceTests {
         }
 
         var count = 0
-        tree.forEachPostOrder { _ in count += 1 }
+        tree.forEach.postOrder { _ in count += 1 }
         #expect(count == 10_000)
     }
 
@@ -185,7 +185,7 @@ struct TreeBinaryPerformanceTests {
         }
 
         var count = 0
-        tree.forEachLevelOrder { _ in count += 1 }
+        tree.forEach.levelOrder { _ in count += 1 }
         #expect(count == 10_000)
     }
 
@@ -338,7 +338,7 @@ struct TreeBinaryPerformanceTests {
         // Height is now iterative - should not stack overflow
         #expect(tree.height == 999)
 
-        // Note: forEachPostOrder is still recursive, skip traversal on deep trees
+        // Note: forEach.postOrder is iterative (deep-tree safe); skip on deep trees here
         // Clear is iterative and should work
         tree.clear()
         #expect(tree.isEmpty)
@@ -584,22 +584,22 @@ struct TreeBinaryStatsTests {
 
         let preOrderTime = clock.measure {
             count = 0
-            tree.forEachPreOrder { _ in count += 1 }
+            tree.forEach.preOrder { _ in count += 1 }
         }
 
         let inOrderTime = clock.measure {
             count = 0
-            tree.forEachInOrder { _ in count += 1 }
+            tree.forEach.inOrder { _ in count += 1 }
         }
 
         let postOrderTime = clock.measure {
             count = 0
-            tree.forEachPostOrder { _ in count += 1 }
+            tree.forEach.postOrder { _ in count += 1 }
         }
 
         let levelOrderTime = clock.measure {
             count = 0
-            tree.forEachLevelOrder { _ in count += 1 }
+            tree.forEach.levelOrder { _ in count += 1 }
         }
 
         print("=== Timed Traversal (\(nodeCount) nodes, complete binary tree) ===")
@@ -625,22 +625,22 @@ struct TreeBinaryStatsTests {
 
         let preOrderTime = clock.measure {
             count = 0
-            tree.forEachPreOrder { _ in count += 1 }
+            tree.forEach.preOrder { _ in count += 1 }
         }
 
         let inOrderTime = clock.measure {
             count = 0
-            tree.forEachInOrder { _ in count += 1 }
+            tree.forEach.inOrder { _ in count += 1 }
         }
 
         let postOrderTime = clock.measure {
             count = 0
-            tree.forEachPostOrder { _ in count += 1 }
+            tree.forEach.postOrder { _ in count += 1 }
         }
 
         let levelOrderTime = clock.measure {
             count = 0
-            tree.forEachLevelOrder { _ in count += 1 }
+            tree.forEach.levelOrder { _ in count += 1 }
         }
 
         print("=== Timed Traversal (\(nodeCount) nodes, left-chain / depth=\(nodeCount - 1)) ===")
