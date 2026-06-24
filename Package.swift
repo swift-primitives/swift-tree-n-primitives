@@ -44,11 +44,11 @@ let package = Package(
         // its six link witnesses) over the shared `Tree.Storage` arena, plus the
         // Order iterators + Order.*.Sequence structs (conformances isolated in the
         // umbrella) + Copyable/Sendable markers (co-located per [MEM-COPY-006]). The
-        // generational column, decode, and shared ops live in `Tree Primitives Core`.
+        // generational column, decode, and shared ops live in `Tree Primitives`.
         .target(
             name: "Tree N Primitive",
             dependencies: [
-                .product(name: "Tree Primitives Core", package: "swift-tree-primitives"),
+                .product(name: "Tree Primitives", package: "swift-tree-primitives"),
                 .product(name: "Column Primitives", package: "swift-column-primitives"),
                 .product(name: "Shared Primitive", package: "swift-shared-primitives"),
                 .product(name: "Storage Generational Primitives", package: "swift-storage-generational-primitives"),

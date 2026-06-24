@@ -17,7 +17,7 @@ public import Queue_Primitives
 public import Shared_Primitive
 public import Storage_Generational_Primitives
 public import Store_Primitive
-public import Tree_Primitives_Core
+public import Tree_Primitives
 
 // MARK: - Level-Order Iterator
 

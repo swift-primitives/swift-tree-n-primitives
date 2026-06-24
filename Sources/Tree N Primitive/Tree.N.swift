@@ -12,7 +12,7 @@
 public import Stack_Primitives
 public import Storage_Generational_Primitives
 public import Store_Primitive
-public import Tree_Primitives_Core
+public import Tree_Primitives
 
 /// A dynamically-growing n-ary tree with compile-time bounded arity.
 ///

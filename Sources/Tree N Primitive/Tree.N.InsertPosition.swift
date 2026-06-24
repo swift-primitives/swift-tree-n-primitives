@@ -9,7 +9,7 @@
 //
 // ===----------------------------------------------------------------------===//
 
-public import Tree_Primitives_Core
+public import Tree_Primitives
 
 // MARK: - N-ary InsertPosition convenience factories
 //

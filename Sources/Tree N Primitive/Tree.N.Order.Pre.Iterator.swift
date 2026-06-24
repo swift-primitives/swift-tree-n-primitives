@@ -15,7 +15,7 @@ public import Stack_Primitive
 internal import Stack_Primitives
 public import Storage_Generational_Primitives
 public import Store_Primitive
-public import Tree_Primitives_Core
+public import Tree_Primitives
 
 // MARK: - Pre-Order Iterator
 

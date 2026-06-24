@@ -13,7 +13,7 @@ public import Property_Primitives
 public import Stack_Primitives
 public import Storage_Generational_Primitives
 public import Store_Primitive
-public import Tree_Primitives_Core
+public import Tree_Primitives
 
 // MARK: - Tree.N forEach.inOrder (binary; R1 W4 [API-NAME-002])
 //
