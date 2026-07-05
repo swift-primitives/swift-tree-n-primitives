@@ -14,7 +14,7 @@ public import Column_Primitives
 internal import Iterator_Primitive
 internal import Iterator_Protocol
 public import Queue_Primitives
-public import Shared_Primitive
+public import Ownership_Shared_Primitive
 public import Storage_Generational_Primitives
 public import Store_Primitive
 public import Tree_Primitives
@@ -32,11 +32,11 @@ extension Tree.N.Order.Level {
         /// required here (not the move-only direct ring) so the iterator struct
         /// itself stays `Copyable`, preserving its pre-reshape shape.
         @usableFromInline
-        var pending: Queue<Shared<Store.Generational.Handle, Column.Ring<Store.Generational.Handle>>>
+        var pending: __Queue<Ownership.Shared<Store.Generational.Handle, Column.Ring<Store.Generational.Handle>>>
 
         package init(tree: Tree.N<n>) {
             self.tree = tree
-            self.pending = Queue<Shared<Store.Generational.Handle, Column.Ring<Store.Generational.Handle>>>()
+            self.pending = __Queue<Ownership.Shared<Store.Generational.Handle, Column.Ring<Store.Generational.Handle>>>()
 
             if let rootHandle = tree._rootHandle {
                 pending.enqueue(rootHandle)
