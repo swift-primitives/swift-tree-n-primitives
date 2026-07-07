@@ -54,24 +54,28 @@ extension Tree.N where n == 2, Element: Copyable {
 
         // MARK: - Expression Building
 
+        /// Wraps a single element expression into a one-element level-order array.
         @inlinable
         public static func buildExpression(_ expression: Element) -> [Element] {
             [expression]
         }
 
+        /// Passes an already-built level-order array through unchanged.
         @inlinable
         public static func buildExpression(_ expression: [Element]) -> [Element] {
             expression
         }
 
-        /// Bulk-add a sequence (Range, Set, lazy chain, etc.) without
-        /// per-iteration allocation. Elements are placed in BFS level-order.
+        /// Bulk-add a sequence (Range, Set, lazy chain, etc.) without per-iteration allocation.
+        ///
+        /// Elements are placed in BFS level-order.
         @inlinable
         public static func buildExpression<S: Swift.Sequence>(_ expression: S) -> [Element]
         where S.Element == Element {
             Array(expression)
         }
 
+        /// Wraps an optional element expression, producing an empty array when it is `nil`.
         @inlinable
         public static func buildExpression(_ expression: Element?) -> [Element] {
             expression.map { [$0] } ?? []
@@ -79,19 +83,24 @@ extension Tree.N where n == 2, Element: Copyable {
 
         // MARK: - Partial Block Building
 
+        /// Begins a partial block with the first level-order array, passed through unchanged.
         @inlinable
         public static func buildPartialBlock(first: [Element]) -> [Element] {
             first
         }
 
+        /// Begins a partial block from an empty first statement, producing an empty array.
         @inlinable
         public static func buildPartialBlock(first: Void) -> [Element] {
             []
         }
 
+        /// Begins a partial block whose first component is statically unreachable.
         @inlinable
         public static func buildPartialBlock(first: Never) -> [Element] {}
 
+        /// Merges an accumulated partial block with the next component, preserving
+        /// declaration (BFS level) order.
         @inlinable
         public static func buildPartialBlock(
             accumulated: consuming [Element],
@@ -103,6 +112,7 @@ extension Tree.N where n == 2, Element: Copyable {
 
         // MARK: - Block Building
 
+        /// Builds an empty level-order array for a block with no components.
         @inlinable
         public static func buildBlock() -> [Element] {
             []
@@ -110,26 +120,31 @@ extension Tree.N where n == 2, Element: Copyable {
 
         // MARK: - Control Flow
 
+        /// Builds from an optional `if`-branch component, producing an empty array when untaken.
         @inlinable
         public static func buildOptional(_ component: [Element]?) -> [Element] {
             component ?? []
         }
 
+        /// Builds the first branch of an `if`-`else` block.
         @inlinable
         public static func buildEither(first: [Element]) -> [Element] {
             first
         }
 
+        /// Builds the second branch of an `if`-`else` block.
         @inlinable
         public static func buildEither(second: [Element]) -> [Element] {
             second
         }
 
+        /// Flattens an array of per-iteration level-order arrays from a `for` loop.
         @inlinable
         public static func buildArray(_ components: [[Element]]) -> [Element] {
             components.flatMap { $0 }
         }
 
+        /// Passes a component through unchanged for an availability-gated (`if #available`) branch.
         @inlinable
         public static func buildLimitedAvailability(_ component: [Element]) -> [Element] {
             component
@@ -165,6 +180,10 @@ extension Tree.N where n == 2, Element: Copyable {
 
         // Insert root.
         var positions: [Tree.Position] = []
+        // WHY: `self.init()` just above guarantees a fresh, empty tree — `.root` can
+        // never already be occupied.
+        // swift-format-ignore: NeverUseForceTry
+        // swiftlint:disable:next force_try
         try! positions.append(self.insert(elements[0], at: .root))
 
         // BFS level-order insert.
@@ -174,11 +193,19 @@ extension Tree.N where n == 2, Element: Copyable {
             let parent = positions[parentIndex]
             // Left child
             if i < elements.count {
+                // WHY: `parentIndex` only ever advances forward, so each parent's left
+                // slot is inserted into exactly once here — it can never already be occupied.
+                // swift-format-ignore: NeverUseForceTry
+                // swiftlint:disable:next force_try
                 try! positions.append(self.insert(elements[i], at: .left(of: parent)))
                 i += 1
             }
             // Right child
             if i < elements.count {
+                // WHY: same reasoning as the left-child insert above — this parent's
+                // right slot is inserted into exactly once, here.
+                // swift-format-ignore: NeverUseForceTry
+                // swiftlint:disable:next force_try
                 try! positions.append(self.insert(elements[i], at: .right(of: parent)))
                 i += 1
             }

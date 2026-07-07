@@ -42,16 +42,19 @@ extension Tree.N.Nested where n == 2, Element: Copyable {
 
         // MARK: - Expression Building
 
+        /// Wraps a single node expression into a one-element array.
         @inlinable
         public static func buildExpression(_ expression: Node) -> [Node] {
             [expression]
         }
 
+        /// Passes an already-built node array through unchanged.
         @inlinable
         public static func buildExpression(_ expression: [Node]) -> [Node] {
             expression
         }
 
+        /// Wraps an optional node expression, producing an empty array when it is `nil`.
         @inlinable
         public static func buildExpression(_ expression: Node?) -> [Node] {
             expression.map { [$0] } ?? []
@@ -59,19 +62,24 @@ extension Tree.N.Nested where n == 2, Element: Copyable {
 
         // MARK: - Partial Block Building
 
+        /// Begins a partial block with the first node array, passed through unchanged.
         @inlinable
         public static func buildPartialBlock(first: [Node]) -> [Node] {
             first
         }
 
+        /// Begins a partial block from an empty first statement, producing an empty array.
         @inlinable
         public static func buildPartialBlock(first: Void) -> [Node] {
             []
         }
 
+        /// Begins a partial block whose first component is statically unreachable.
         @inlinable
         public static func buildPartialBlock(first: Never) -> [Node] {}
 
+        /// Merges an accumulated partial block with the next component, preserving
+        /// declaration order.
         @inlinable
         public static func buildPartialBlock(
             accumulated: [Node],
@@ -82,6 +90,7 @@ extension Tree.N.Nested where n == 2, Element: Copyable {
 
         // MARK: - Block Building
 
+        /// Builds an empty node array for a block with no components.
         @inlinable
         public static func buildBlock() -> [Node] {
             []
@@ -89,26 +98,31 @@ extension Tree.N.Nested where n == 2, Element: Copyable {
 
         // MARK: - Control Flow
 
+        /// Builds from an optional `if`-branch component, producing an empty array when untaken.
         @inlinable
         public static func buildOptional(_ component: [Node]?) -> [Node] {
             component ?? []
         }
 
+        /// Builds the first branch of an `if`-`else` block.
         @inlinable
         public static func buildEither(first: [Node]) -> [Node] {
             first
         }
 
+        /// Builds the second branch of an `if`-`else` block.
         @inlinable
         public static func buildEither(second: [Node]) -> [Node] {
             second
         }
 
+        /// Flattens an array of per-iteration node arrays from a `for` loop.
         @inlinable
         public static func buildArray(_ components: [[Node]]) -> [Node] {
             components.flatMap { $0 }
         }
 
+        /// Passes a component through unchanged for an availability-gated (`if #available`) branch.
         @inlinable
         public static func buildLimitedAvailability(_ component: [Node]) -> [Node] {
             component
@@ -158,6 +172,10 @@ extension Tree.N where n == 2, Element: Copyable {
         )
         self.init()
         guard let root = roots.first else { return }
+        // WHY: `self.init()` just above guarantees a fresh, empty tree — `.root` can
+        // never already be occupied.
+        // swift-format-ignore: NeverUseForceTry
+        // swiftlint:disable:next force_try
         let rootPos = try! self.insert(root.element, at: .root)
         Self._insertChildren(root.children, parent: rootPos, into: &self)
     }
@@ -170,14 +188,21 @@ extension Tree.N where n == 2, Element: Copyable {
     ) {
         if children.count >= 1 {
             let leftNode = children[0]
+            // WHY: each `Node` contributes at most one left child, inserted exactly
+            // once here — `parent`'s left slot can never already be occupied.
+            // swift-format-ignore: NeverUseForceTry
+            // swiftlint:disable:next force_try
             let leftPos = try! tree.insert(leftNode.element, at: .left(of: parent))
             _insertChildren(leftNode.children, parent: leftPos, into: &tree)
         }
         if children.count >= 2 {
             let rightNode = children[1]
+            // WHY: same reasoning as the left-child insert above — this parent's
+            // right slot is inserted into exactly once, here.
+            // swift-format-ignore: NeverUseForceTry
+            // swiftlint:disable:next force_try
             let rightPos = try! tree.insert(rightNode.element, at: .right(of: parent))
             _insertChildren(rightNode.children, parent: rightPos, into: &tree)
         }
     }
 }
-

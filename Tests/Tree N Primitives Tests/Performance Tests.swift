@@ -405,9 +405,12 @@ struct TreeBinaryStatsTests {
     //
     //        func logArenaState(_ tree: Tree<Int>.N<2>, label: Int) {
     //            let h = tree._arena.header
+    //            (dead/disabled debug code below — inert text, not compiled)
+    //            swiftlint:disable no_int_bitpattern_arithmetic
     //            let occ = Int(bitPattern: h.occupied)
     //            let hw = Int(bitPattern: h.highWater)
     //            let cap = Int(bitPattern: h.capacity)
+    //            swiftlint:enable no_int_bitpattern_arithmetic
     //            let freeCount = hw - occ
     //            let util = cap > 0 ? String(format: "%.1f%%", Double(occ) / Double(cap) * 100) : "n/a"
     //            print(String(format: "%5d | %8d | %9d | %8d | %9d | %@", label, occ, hw, cap, freeCount, util))
@@ -496,6 +499,8 @@ struct TreeBinaryStatsTests {
     //
     //        let hAfter = tree._arena.header
     //        print("After removing \(removedCount) leaves: occupied=\(Int(bitPattern: hAfter.occupied)) highWater=\(Int(bitPattern: hAfter.highWater)) freeHead=\(hAfter.freeHead) hasFree=\(hAfter.hasFree)")
+    //        (dead/disabled debug code — inert text, not compiled)
+    //        swiftlint:disable:next no_int_bitpattern_arithmetic
     //        print("Free slots on list: \(Int(bitPattern: hAfter.highWater) - Int(bitPattern: hAfter.occupied))")
     //
     //        // Re-insert into freed slots
@@ -1014,6 +1019,8 @@ struct TreeBinaryStatsTests {
     //        let hAfterChurn = tree._arena.header
     //        print("After churn: occupied=\(Int(bitPattern: hAfterChurn.occupied)) highWater=\(Int(bitPattern: hAfterChurn.highWater)) capacity=\(Int(bitPattern: hAfterChurn.capacity))")
     //        print("Removed: \(totalRemoved) Inserted: \(totalInserted)")
+    //        (dead/disabled debug code — inert text, not compiled)
+    //        swiftlint:disable:next no_int_bitpattern_arithmetic
     //        print("HighWater grew by: \(Int(bitPattern: hAfterChurn.highWater) - Int(bitPattern: hBeforeChurn.highWater)) (0 = perfect slot reuse)")
     //        print("Total churn time: \(churnTime)")
     //    }

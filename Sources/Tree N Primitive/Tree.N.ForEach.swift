@@ -25,8 +25,9 @@ public import Tree_Primitives
 
 extension Property_Primitives.Property.Borrow
 where Base: __TreeProtocol & ~Copyable, Tag == __TreeForEach, Base.Address == __TreeNChildSlot<2> {
-    /// Visits every element in in-order (left subtree, root, right subtree). Binary
-    /// trees only (`Tree.N<2>` / `Tree.Binary`). Iterative (deep-tree safe).
+    /// Visits every element in in-order (left subtree, root, right subtree).
+    ///
+    /// Binary trees only (`Tree.N<2>` / `Tree.Binary`). Iterative (deep-tree safe).
     @inlinable
     public func inOrder(_ body: (borrowing Base.Element) -> Void) {
         guard let rootHandle = base.value._rootHandle else { return }
@@ -40,7 +41,7 @@ where Base: __TreeProtocol & ~Copyable, Tag == __TreeForEach, Base.Address == __
                 current = base.value._childHandle(at: c, address: .left)
             }
             // Visit the node, then move into its right subtree.
-            let c = pending.pop()!
+            guard let c = pending.pop() else { break }
             base.value._withElement(at: c) { body($0) }
             current = base.value._childHandle(at: c, address: .right)
         }

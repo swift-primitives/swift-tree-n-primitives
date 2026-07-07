@@ -45,8 +45,10 @@ extension Tree.N.Nested where n == 2, Element: Copyable {
     /// try tree.insert(3, at: .right(of: root))
     /// ```
     public struct Node {
+        /// The value stored at this node.
         public let element: Element
-        public let children: [Node]
+        /// This node's children (at most 2; first = left, second = right).
+        public let children: [Self]
 
         /// Creates a leaf node (no children).
         @inlinable
@@ -62,7 +64,7 @@ extension Tree.N.Nested where n == 2, Element: Copyable {
         @inlinable
         public init(
             _ element: Element,
-            @Tree<Element>.N<2>.Nested.Builder _ children: () -> [Node]
+            @Tree<Element>.N<2>.Nested.Builder _ children: () -> [Self]
         ) {
             self.element = element
             self.children = children()

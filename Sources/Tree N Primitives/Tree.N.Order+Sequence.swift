@@ -9,11 +9,11 @@
 //
 // ===----------------------------------------------------------------------===//
 
-public import Tree_N_Primitive
 public import Iterable
-public import Iterator_Primitive
 public import Iterator_Chunk_Primitives
+public import Iterator_Primitive
 public import Sequence_Protocol_Primitives
+public import Tree_N_Primitive
 
 // MARK: - Iterable + Sequenceable Conformances (isolated per [MOD-004] / [MOD-036])
 //
@@ -33,12 +33,14 @@ public import Sequence_Protocol_Primitives
 // MARK: Pre
 
 extension Tree.N.Order.Pre.Sequence: Iterable where Element: Copyable {
-    @_implements(Iterable, Iterator)
+    /// The multipass borrowing iterator for pre-order traversal.
+    @_implements(Iterable,Iterator)
     public typealias IterableIterator =
         Iterator_Primitive.Iterator.Materializing<Tree<Element>.N<n>.Order.Pre.Iterator>
 
+    /// Returns a borrowing iterator over the tree in pre-order.
     @_lifetime(borrow self)
-    @_implements(Iterable, makeIterator())
+    @_implements(Iterable,makeIterator())
     public borrowing func iterableMakeIterator()
         -> Iterator_Primitive.Iterator.Materializing<Tree<Element>.N<n>.Order.Pre.Iterator>
     {
@@ -47,9 +49,11 @@ extension Tree.N.Order.Pre.Sequence: Iterable where Element: Copyable {
 }
 
 extension Tree.N.Order.Pre.Sequence: Sequenceable where Element: Copyable {
-    @_implements(Sequenceable, Iterator)
+    /// The consuming iterator for pre-order traversal.
+    @_implements(Sequenceable,Iterator)
     public typealias SequenceableIterator = Tree<Element>.N<n>.Order.Pre.Iterator
 
+    /// Consumes this sequence, yielding an iterator over the tree in pre-order.
     public consuming func makeIterator() -> Tree<Element>.N<n>.Order.Pre.Iterator {
         Tree<Element>.N<n>.Order.Pre.Iterator(tree: tree)
     }
@@ -58,12 +62,14 @@ extension Tree.N.Order.Pre.Sequence: Sequenceable where Element: Copyable {
 // MARK: Post
 
 extension Tree.N.Order.Post.Sequence: Iterable where Element: Copyable {
-    @_implements(Iterable, Iterator)
+    /// The multipass borrowing iterator for post-order traversal.
+    @_implements(Iterable,Iterator)
     public typealias IterableIterator =
         Iterator_Primitive.Iterator.Materializing<Tree<Element>.N<n>.Order.Post.Iterator>
 
+    /// Returns a borrowing iterator over the tree in post-order.
     @_lifetime(borrow self)
-    @_implements(Iterable, makeIterator())
+    @_implements(Iterable,makeIterator())
     public borrowing func iterableMakeIterator()
         -> Iterator_Primitive.Iterator.Materializing<Tree<Element>.N<n>.Order.Post.Iterator>
     {
@@ -72,9 +78,11 @@ extension Tree.N.Order.Post.Sequence: Iterable where Element: Copyable {
 }
 
 extension Tree.N.Order.Post.Sequence: Sequenceable where Element: Copyable {
-    @_implements(Sequenceable, Iterator)
+    /// The consuming iterator for post-order traversal.
+    @_implements(Sequenceable,Iterator)
     public typealias SequenceableIterator = Tree<Element>.N<n>.Order.Post.Iterator
 
+    /// Consumes this sequence, yielding an iterator over the tree in post-order.
     public consuming func makeIterator() -> Tree<Element>.N<n>.Order.Post.Iterator {
         Tree<Element>.N<n>.Order.Post.Iterator(tree: tree)
     }
@@ -83,12 +91,14 @@ extension Tree.N.Order.Post.Sequence: Sequenceable where Element: Copyable {
 // MARK: Level
 
 extension Tree.N.Order.Level.Sequence: Iterable where Element: Copyable {
-    @_implements(Iterable, Iterator)
+    /// The multipass borrowing iterator for level-order traversal.
+    @_implements(Iterable,Iterator)
     public typealias IterableIterator =
         Iterator_Primitive.Iterator.Materializing<Tree<Element>.N<n>.Order.Level.Iterator>
 
+    /// Returns a borrowing iterator over the tree in level-order.
     @_lifetime(borrow self)
-    @_implements(Iterable, makeIterator())
+    @_implements(Iterable,makeIterator())
     public borrowing func iterableMakeIterator()
         -> Iterator_Primitive.Iterator.Materializing<Tree<Element>.N<n>.Order.Level.Iterator>
     {
@@ -97,9 +107,11 @@ extension Tree.N.Order.Level.Sequence: Iterable where Element: Copyable {
 }
 
 extension Tree.N.Order.Level.Sequence: Sequenceable where Element: Copyable {
-    @_implements(Sequenceable, Iterator)
+    /// The consuming iterator for level-order traversal.
+    @_implements(Sequenceable,Iterator)
     public typealias SequenceableIterator = Tree<Element>.N<n>.Order.Level.Iterator
 
+    /// Consumes this sequence, yielding an iterator over the tree in level-order.
     public consuming func makeIterator() -> Tree<Element>.N<n>.Order.Level.Iterator {
         Tree<Element>.N<n>.Order.Level.Iterator(tree: tree)
     }
@@ -108,12 +120,14 @@ extension Tree.N.Order.Level.Sequence: Sequenceable where Element: Copyable {
 // MARK: In
 
 extension Tree.N.Order.In.Sequence: Iterable where Element: Copyable {
-    @_implements(Iterable, Iterator)
+    /// The multipass borrowing iterator for in-order traversal.
+    @_implements(Iterable,Iterator)
     public typealias IterableIterator =
         Iterator_Primitive.Iterator.Materializing<Tree<Element>.N<n>.Order.In.Iterator>
 
+    /// Returns a borrowing iterator over the tree in in-order.
     @_lifetime(borrow self)
-    @_implements(Iterable, makeIterator())
+    @_implements(Iterable,makeIterator())
     public borrowing func iterableMakeIterator()
         -> Iterator_Primitive.Iterator.Materializing<Tree<Element>.N<n>.Order.In.Iterator>
     {
@@ -122,9 +136,11 @@ extension Tree.N.Order.In.Sequence: Iterable where Element: Copyable {
 }
 
 extension Tree.N.Order.In.Sequence: Sequenceable where Element: Copyable {
-    @_implements(Sequenceable, Iterator)
+    /// The consuming iterator for in-order traversal.
+    @_implements(Sequenceable,Iterator)
     public typealias SequenceableIterator = Tree<Element>.N<n>.Order.In.Iterator
 
+    /// Consumes this sequence, yielding an iterator over the tree in in-order.
     public consuming func makeIterator() -> Tree<Element>.N<n>.Order.In.Iterator {
         Tree<Element>.N<n>.Order.In.Iterator(tree: tree)
     }

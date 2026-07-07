@@ -43,10 +43,12 @@ extension Tree.N.Order.Post {
             }
         }
 
+        /// Advances to the next node in post-order (left subtree, then right
+        /// subtree, then root), or returns `nil` when traversal is exhausted.
         @inlinable
         public mutating func next() -> Element? {
             while !pending.isEmpty {
-                let current = pending.peek { $0 }!
+                guard let current = pending.peek({ $0 }) else { break }
                 let childHandles = tree._storage.withLinks(at: current) { $0 }
 
                 var rightmostChild: Store.Generational.Handle? = nil

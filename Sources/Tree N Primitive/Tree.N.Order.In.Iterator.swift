@@ -40,6 +40,8 @@ extension Tree.N.Order.In {
             self.current = tree._rootHandle
         }
 
+        /// Advances to the next node in in-order (left subtree, then root, then
+        /// right subtree), or returns `nil` when traversal is exhausted.
         @inlinable
         public mutating func next() -> Element? {
             while current != nil || !pending.isEmpty {
@@ -50,7 +52,7 @@ extension Tree.N.Order.In {
                 }
 
                 // Process node
-                let c = pending.pop()!
+                guard let c = pending.pop() else { return nil }
                 let element = tree._storage.withElement(at: c) { $0 }
                 let right = tree._storage.withLinks(at: c) { $0[1] }
 

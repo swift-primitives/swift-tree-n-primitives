@@ -37,11 +37,12 @@ extension Tree.N.Order.Pre {
             }
         }
 
+        /// Advances to the next node in pre-order (root, then left subtree, then
+        /// right subtree), or returns `nil` when traversal is exhausted.
         @inlinable
         public mutating func next() -> Element? {
-            guard !pending.isEmpty else { return nil }
+            guard let handle = pending.pop() else { return nil }
 
-            let handle = pending.pop()!
             let element = tree._storage.withElement(at: handle) { $0 }
             let childHandles = tree._storage.withLinks(at: handle) { $0 }
 

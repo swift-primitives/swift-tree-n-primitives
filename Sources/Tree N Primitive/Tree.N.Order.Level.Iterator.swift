@@ -13,8 +13,8 @@ public import Buffer_Ring_Primitive
 public import Column_Primitives
 internal import Iterator_Primitive
 internal import Iterator_Protocol
-public import Queue_Primitives
 public import Ownership_Shared_Primitive
+public import Queue_Primitives
 public import Storage_Generational_Primitives
 public import Store_Primitive
 public import Tree_Primitives
@@ -43,11 +43,12 @@ extension Tree.N.Order.Level {
             }
         }
 
+        /// Advances to the next node in level-order (breadth-first), or returns
+        /// `nil` when traversal is exhausted.
         @inlinable
         public mutating func next() -> Element? {
-            guard !pending.isEmpty else { return nil }
+            guard let handle = pending.dequeue() else { return nil }
 
-            let handle = pending.dequeue()!
             let element = tree._storage.withElement(at: handle) { $0 }
             let childHandles = tree._storage.withLinks(at: handle) { $0 }
 

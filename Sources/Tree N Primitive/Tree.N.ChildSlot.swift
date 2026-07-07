@@ -37,10 +37,9 @@ public struct __TreeNChildSlot<let n: Int>: Sendable, Equatable, Hashable {
     /// The slot index within the range `0..<n`.
     public let index: Int
 
-    /// Creates a child slot from a raw index.
+    /// Creates a child slot from a raw index, or `nil` if `index` is out of bounds.
     ///
     /// - Parameter index: The slot index. Must be in range `0..<n`.
-    /// - Returns: `nil` if the index is out of bounds.
     @inlinable
     public init?(_ index: Int) {
         guard index >= 0 && index < n else { return nil }
@@ -110,6 +109,7 @@ extension __TreeNChildSlot where n == 4 {
 // MARK: - CustomStringConvertible
 
 extension __TreeNChildSlot: CustomStringConvertible {
+    /// A textual representation of the slot, e.g. `"ChildSlot(0)"`.
     public var description: String {
         "ChildSlot(\(index))"
     }

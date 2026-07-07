@@ -14,70 +14,70 @@ public import Storage_Generational_Primitives
 public import Store_Primitive
 public import Tree_Primitives
 
-/// A dynamically-growing n-ary tree with compile-time bounded arity.
-///
-/// `Tree.N<n>` is the general-purpose bounded-arity tree primitive: each node may
-/// have at most `n` children, addressed by a bounded ``ChildSlot`` (`0..<n`). Child
-/// slots are sparse — holes are permitted; inserting into an occupied slot fails
-/// with ``Error/slotOccupied``.
-///
-/// It is the bounded-arity ``Tree/Protocol`` conformer: the generational arena,
-/// decode (Round M B2), token validation, typed counts (A3), the
-/// position-survives-growth contract, and the shared insert / remove / navigation /
-/// traversal algorithms live in ``Tree/Storage`` + the ``Tree/Protocol`` defaults.
-/// This type supplies the sparse `InlineArray<n, Handle?>` child-link representation
-/// and its six link witnesses; the binary `left`/`right` ride the shared `child`
-/// navigation, and in-order traversal is the `forEach.inOrder` accessor.
-///
-/// ## Example
-///
-/// ```swift
-/// // Binary tree (n=2)
-/// var tree = Tree<Int>.N<2>()
-/// let root = try tree.insert(1, at: .root)
-/// let left = try tree.insert(2, at: .left(of: root))
-/// let right = try tree.insert(3, at: .right(of: root))
-///
-/// tree.forEachInOrder { element in
-///     print(element)  // 2, 1, 3
-/// }
-///
-/// // Quad tree (n=4)
-/// var quad = Tree<Int>.N<4>()
-/// let qroot = try quad.insert(0, at: .root)
-/// _ = try quad.insert(1, at: .northwest(of: qroot))
-/// _ = try quad.insert(2, at: .southeast(of: qroot))
-/// ```
-///
-/// ## Sparse Child Slots
-///
-/// Per [TREE-003], `Tree<Element>.N<n>` uses sparse child slots: each node stores
-/// `InlineArray<n, Handle?>` where `nil` denotes an empty slot. Holes are permitted.
-///
-/// ## Move-Only Support
-///
-/// Both the tree and its elements may be `~Copyable`:
-///
-/// ```swift
-/// struct FileHandle: ~Copyable { ... }
-/// var handles = Tree<FileHandle>.N<2>()
-/// let root = try handles.insert(FileHandle(), at: .root)
-/// ```
-///
-/// ## Copy-on-Write
-///
-/// When `Element` is `Copyable`, `Tree.N` is copy-on-write: copies share the
-/// generational column behind the `Shared` CoW box until mutation. The clone
-/// strategy is the GENERATION-PRESERVING deep copy, so a position minted before a
-/// CoW detach keeps resolving on both sides of the split.
-///
-/// - Note: Declared in an extension. Swift 6.2.4 resolved the value-generic
-///   nested type extension restriction ([COPY-FIX-002]).
 extension Tree where Element: ~Copyable {
 
     // Conforms to the hoisted `__TreeProtocol` (the `Tree.Protocol` surfacing): the
     // `.Protocol` typealias spelling collides with the metatype keyword in a
     // conformance clause, so the hoisted name is named directly here (as `Tree` does).
+    /// A dynamically-growing n-ary tree with compile-time bounded arity.
+    ///
+    /// `Tree.N<n>` is the general-purpose bounded-arity tree primitive: each node may
+    /// have at most `n` children, addressed by a bounded ``ChildSlot`` (`0..<n`). Child
+    /// slots are sparse — holes are permitted; inserting into an occupied slot fails
+    /// with ``Error/slotOccupied``.
+    ///
+    /// It is the bounded-arity ``Tree/Protocol`` conformer: the generational arena,
+    /// decode (Round M B2), token validation, typed counts (A3), the
+    /// position-survives-growth contract, and the shared insert / remove / navigation /
+    /// traversal algorithms live in ``Tree/Storage`` + the ``Tree/Protocol`` defaults.
+    /// This type supplies the sparse `InlineArray<n, Handle?>` child-link representation
+    /// and its six link witnesses; the binary `left`/`right` ride the shared `child`
+    /// navigation, and in-order traversal is the `forEach.inOrder` accessor.
+    ///
+    /// ## Example
+    ///
+    /// ```swift
+    /// // Binary tree (n=2)
+    /// var tree = Tree<Int>.N<2>()
+    /// let root = try tree.insert(1, at: .root)
+    /// let left = try tree.insert(2, at: .left(of: root))
+    /// let right = try tree.insert(3, at: .right(of: root))
+    ///
+    /// tree.forEachInOrder { element in
+    ///     print(element)  // 2, 1, 3
+    /// }
+    ///
+    /// // Quad tree (n=4)
+    /// var quad = Tree<Int>.N<4>()
+    /// let qroot = try quad.insert(0, at: .root)
+    /// _ = try quad.insert(1, at: .northwest(of: qroot))
+    /// _ = try quad.insert(2, at: .southeast(of: qroot))
+    /// ```
+    ///
+    /// ## Sparse Child Slots
+    ///
+    /// Per [TREE-003], `Tree<Element>.N<n>` uses sparse child slots: each node stores
+    /// `InlineArray<n, Handle?>` where `nil` denotes an empty slot. Holes are permitted.
+    ///
+    /// ## Move-Only Support
+    ///
+    /// Both the tree and its elements may be `~Copyable`:
+    ///
+    /// ```swift
+    /// struct FileHandle: ~Copyable { ... }
+    /// var handles = Tree<FileHandle>.N<2>()
+    /// let root = try handles.insert(FileHandle(), at: .root)
+    /// ```
+    ///
+    /// ## Copy-on-Write
+    ///
+    /// When `Element` is `Copyable`, `Tree.N` is copy-on-write: copies share the
+    /// generational column behind the `Shared` CoW box until mutation. The clone
+    /// strategy is the GENERATION-PRESERVING deep copy, so a position minted before a
+    /// CoW detach keeps resolving on both sides of the split.
+    ///
+    /// - Note: Declared in an extension. Swift 6.2.4 resolved the value-generic
+    ///   nested type extension restriction ([COPY-FIX-002]).
     public struct N<let n: Int>: ~Copyable, __TreeProtocol {
 
         // MARK: - Typealiases
