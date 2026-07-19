@@ -18,7 +18,7 @@ import Tree_N_Primitives_Test_Support
 // MARK: - Performance Tests
 
 @Suite(.serialized)
-struct TreeBinaryPerformanceTests {
+struct `Tree Binary Performance Tests` {
 
     // MARK: - Insert Performance
 
@@ -366,7 +366,7 @@ struct TreeBinaryPerformanceTests {
 // MARK: - Performance Stats
 
 @Suite(.serialized)
-struct TreeBinaryStatsTests {
+struct `Tree Binary Stats Tests` {
 
     // MARK: - Memory Layout
 

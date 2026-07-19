@@ -9,12 +9,10 @@
 //
 // ===----------------------------------------------------------------------===//
 
-// MARK: - Level-Order Namespace
+extension __TreeNOrder {
 
-extension Tree.N.Order {
-
-    /// Namespace for level-order traversal types.
+    /// Namespace for pre-order traversal types.
     ///
-    /// Level-order traversal visits nodes breadth-first (by level).
-    public enum Level {}
+    /// Pre-order traversal visits the root first, then children in slot order.
+    public enum Pre {}
 }

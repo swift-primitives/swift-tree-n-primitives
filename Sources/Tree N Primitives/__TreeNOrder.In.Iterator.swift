@@ -17,16 +17,20 @@ public import Storage_Generational_Primitives
 public import Store_Primitive
 public import Tree_Primitives
 
-// MARK: - In-Order Iterator
+extension __TreeNOrder.In {
 
-extension Tree.N.Order.In {
-
-    /// An iterator for in-order traversal.
+    /// An iterator for in-order traversal (left subtree, root, right subtree).
     ///
-    /// Only available for binary trees (n == 2).
-    public struct Iterator: Iterator_Primitive.Iterator.`Protocol` {
+    /// Only available for binary trees (`S.Address == __TreeNChildSlot<2>`).
+    ///
+    /// Move-only (`~Copyable`): the traversal scratch is the canonical direct
+    /// `Stack<Handle>`, which is move-only regardless of element (the W2 stack reshape);
+    /// the whole `Iterator.Protocol` / `Iterable` / `Materializing` machinery suppresses
+    /// `~Copyable`, so the iterator rides it without a CoW column (seat D3 ruling (a)).
+    public struct Iterator<S: __TreeNStorage>: ~Copyable, Iterator_Primitive.Iterator.`Protocol`
+    where S.Element: Copyable, S.Address == __TreeNChildSlot<2> {
         @usableFromInline
-        let tree: Tree.N<n>
+        let tree: __Tree<S>
 
         @usableFromInline
         var pending: Stack<Store.Generational.Handle>
@@ -34,7 +38,8 @@ extension Tree.N.Order.In {
         @usableFromInline
         var current: Store.Generational.Handle?
 
-        package init(tree: Tree.N<n>) {
+        @usableFromInline
+        init(tree: __Tree<S>) {
             self.tree = tree
             self.pending = Stack<Store.Generational.Handle>()
             self.current = tree._rootHandle
@@ -43,23 +48,22 @@ extension Tree.N.Order.In {
         /// Advances to the next node in in-order (left subtree, then root, then
         /// right subtree), or returns `nil` when traversal is exhausted.
         @inlinable
-        public mutating func next() -> Element? {
+        public mutating func next() -> S.Element? {
             while current != nil || !pending.isEmpty {
                 // Go to leftmost node
                 while let c = current {
                     pending.push(c)
-                    current = tree._storage.withLinks(at: c) { $0[0] }
+                    current = tree._childHandle(of: c, at: .left)
                 }
 
                 // Process node
                 guard let c = pending.pop() else { return nil }
-                let element = tree._storage.withElement(at: c) { $0 }
-                let right = tree._storage.withLinks(at: c) { $0[1] }
+                let value = tree._value(of: c)
 
                 // Move to right subtree
-                current = right
+                current = tree._childHandle(of: c, at: .right)
 
-                return element
+                return value
             }
 
             return nil

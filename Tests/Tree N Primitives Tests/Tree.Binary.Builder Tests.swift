@@ -16,18 +16,18 @@ import Tree_N_Primitives_Test_Support
 
 // MARK: - Test Suite Structure
 
-@Suite("Tree.Binary.Builder")
-struct TreeBinaryBuilderTests {
+@Suite
+struct `Tree.Binary.Builder` {
     @Suite struct Unit {}
-    @Suite struct EdgeCase {}
+    @Suite struct `Edge Case` {}
     @Suite struct Integration {}
-    @Suite struct LevelOrder {}
-    @Suite struct StaticMethods {}
+    @Suite struct `Level Order` {}
+    @Suite struct `Static Methods` {}
 }
 
 // MARK: - Helpers
 
-extension TreeBinaryBuilderTests {
+extension `Tree.Binary.Builder` {
     /// Collect elements via in-order traversal (Left, Root, Right).
     fileprivate static func inOrder(
         _ tree: borrowing Tree<Int>.Binary
@@ -49,7 +49,7 @@ extension TreeBinaryBuilderTests {
 
 // MARK: - Level Order Construction
 
-extension TreeBinaryBuilderTests.LevelOrder {
+extension `Tree.Binary.Builder`.`Level Order` {
 
     @Test
     func `Single element makes root`() {
@@ -65,9 +65,9 @@ extension TreeBinaryBuilderTests.LevelOrder {
             3
         }
         // In-order traversal: left, root, right = 2, 1, 3
-        #expect(TreeBinaryBuilderTests.inOrder(tree) == [2, 1, 3])
+        #expect(`Tree.Binary.Builder`.inOrder(tree) == [2, 1, 3])
         // Pre-order traversal: root, left, right = 1, 2, 3
-        #expect(TreeBinaryBuilderTests.preOrder(tree) == [1, 2, 3])
+        #expect(`Tree.Binary.Builder`.preOrder(tree) == [1, 2, 3])
     }
 
     @Test
@@ -88,15 +88,15 @@ extension TreeBinaryBuilderTests.LevelOrder {
             7
         }
         // In-order: 4, 2, 5, 1, 6, 3, 7
-        #expect(TreeBinaryBuilderTests.inOrder(tree) == [4, 2, 5, 1, 6, 3, 7])
+        #expect(`Tree.Binary.Builder`.inOrder(tree) == [4, 2, 5, 1, 6, 3, 7])
         // Pre-order: 1, 2, 4, 5, 3, 6, 7
-        #expect(TreeBinaryBuilderTests.preOrder(tree) == [1, 2, 4, 5, 3, 6, 7])
+        #expect(`Tree.Binary.Builder`.preOrder(tree) == [1, 2, 4, 5, 3, 6, 7])
     }
 }
 
 // MARK: - Unit Tests
 
-extension TreeBinaryBuilderTests.Unit {
+extension `Tree.Binary.Builder`.Unit {
 
     @Test
     func `Empty block produces empty tree`() {
@@ -126,13 +126,13 @@ extension TreeBinaryBuilderTests.Unit {
         }
         #expect(tree.count == 2)
         // Pre-order: root, left = 10, 20
-        #expect(TreeBinaryBuilderTests.preOrder(tree) == [10, 20])
+        #expect(`Tree.Binary.Builder`.preOrder(tree) == [10, 20])
     }
 }
 
 // MARK: - Control Flow
 
-extension TreeBinaryBuilderTests.Unit {
+extension `Tree.Binary.Builder`.Unit {
 
     @Test
     func `Conditional include adds to layout`() {
@@ -173,7 +173,7 @@ extension TreeBinaryBuilderTests.Unit {
 
 // MARK: - Edge Cases
 
-extension TreeBinaryBuilderTests.EdgeCase {
+extension `Tree.Binary.Builder`.`Edge Case` {
 
     @Test
     func `Many elements`() {
@@ -201,7 +201,7 @@ extension TreeBinaryBuilderTests.EdgeCase {
 
 // MARK: - Integration
 
-extension TreeBinaryBuilderTests.Integration {
+extension `Tree.Binary.Builder`.Integration {
 
     @Test
     func `Builder result accepts further inserts via imperative API`() throws {
@@ -220,7 +220,7 @@ extension TreeBinaryBuilderTests.Integration {
 
 // MARK: - Static Method Tests
 
-extension TreeBinaryBuilderTests.StaticMethods {
+extension `Tree.Binary.Builder`.`Static Methods` {
 
     @Test
     func `buildExpression single element`() {

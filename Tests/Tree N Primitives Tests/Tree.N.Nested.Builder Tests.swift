@@ -16,13 +16,13 @@ import Tree_N_Primitives_Test_Support
 
 // MARK: - Test Suite Structure
 
-@Suite("Tree.N<2>.Nested.Builder")
-struct TreeBinaryNestedBuilderTests {
+@Suite
+struct `Tree.N<2>.Nested.Builder` {
     @Suite struct Unit {}
-    @Suite struct EdgeCase {}
+    @Suite struct `Edge Case` {}
     @Suite struct Sparse {}
-    @Suite struct DepthCoverage {}
-    @Suite struct StaticMethods {}
+    @Suite struct `Depth Coverage` {}
+    @Suite struct `Static Methods` {}
 }
 
 // MARK: - Aliases (ergonomic test syntax)
@@ -31,7 +31,7 @@ private typealias BNode = Tree<Int>.N<2>.Nested.Node
 
 // MARK: - Helpers
 
-extension TreeBinaryNestedBuilderTests {
+extension `Tree.N<2>.Nested.Builder` {
     fileprivate static func preOrder(_ tree: borrowing Tree<Int>.N<2>) -> [Int] {
         var result: [Int] = []
         tree.forEach.preOrder { result.append($0) }
@@ -47,7 +47,7 @@ extension TreeBinaryNestedBuilderTests {
 
 // MARK: - Unit Tests
 
-extension TreeBinaryNestedBuilderTests.Unit {
+extension `Tree.N<2>.Nested.Builder`.Unit {
 
     // Note: empty-body case is handled by Round-1 flat-BFS builder
     // (Tree<Int>.N<2> { } with no Element expression). The nested-DSL
@@ -60,7 +60,7 @@ extension TreeBinaryNestedBuilderTests.Unit {
             BNode(42)
         }
         #expect(tree.count == 1)
-        #expect(TreeBinaryNestedBuilderTests.preOrder(tree) == [42])
+        #expect(`Tree.N<2>.Nested.Builder`.preOrder(tree) == [42])
     }
 
     @Test
@@ -72,9 +72,9 @@ extension TreeBinaryNestedBuilderTests.Unit {
             }
         }
         // Pre-order: root, left, right = [1, 2, 3]
-        #expect(TreeBinaryNestedBuilderTests.preOrder(tree) == [1, 2, 3])
+        #expect(`Tree.N<2>.Nested.Builder`.preOrder(tree) == [1, 2, 3])
         // In-order: left, root, right = [2, 1, 3]
-        #expect(TreeBinaryNestedBuilderTests.inOrder(tree) == [2, 1, 3])
+        #expect(`Tree.N<2>.Nested.Builder`.inOrder(tree) == [2, 1, 3])
     }
 
     @Test
@@ -92,15 +92,15 @@ extension TreeBinaryNestedBuilderTests.Unit {
             }
         }
         // Pre-order: 1, 2, 4, 5, 3, 6, 7
-        #expect(TreeBinaryNestedBuilderTests.preOrder(tree) == [1, 2, 4, 5, 3, 6, 7])
+        #expect(`Tree.N<2>.Nested.Builder`.preOrder(tree) == [1, 2, 4, 5, 3, 6, 7])
         // In-order: 4, 2, 5, 1, 6, 3, 7
-        #expect(TreeBinaryNestedBuilderTests.inOrder(tree) == [4, 2, 5, 1, 6, 3, 7])
+        #expect(`Tree.N<2>.Nested.Builder`.inOrder(tree) == [4, 2, 5, 1, 6, 3, 7])
     }
 }
 
 // MARK: - Sparse Trees (key advantage of nested over flat-BFS)
 
-extension TreeBinaryNestedBuilderTests.Sparse {
+extension `Tree.N<2>.Nested.Builder`.Sparse {
 
     @Test
     func `Root with left child only`() {
@@ -110,7 +110,7 @@ extension TreeBinaryNestedBuilderTests.Sparse {
             }
         }
         // Pre-order: 1, 2 (no right child)
-        #expect(TreeBinaryNestedBuilderTests.preOrder(tree) == [1, 2])
+        #expect(`Tree.N<2>.Nested.Builder`.preOrder(tree) == [1, 2])
     }
 
     @Test
@@ -126,7 +126,7 @@ extension TreeBinaryNestedBuilderTests.Sparse {
             }
         }
         // Pre-order: 1, 2, 4, 8, 3
-        #expect(TreeBinaryNestedBuilderTests.preOrder(tree) == [1, 2, 4, 8, 3])
+        #expect(`Tree.N<2>.Nested.Builder`.preOrder(tree) == [1, 2, 4, 8, 3])
     }
 
     @Test
@@ -140,13 +140,13 @@ extension TreeBinaryNestedBuilderTests.Sparse {
                 }
             }
         }
-        #expect(TreeBinaryNestedBuilderTests.preOrder(tree) == [1, 2, 3, 4])
+        #expect(`Tree.N<2>.Nested.Builder`.preOrder(tree) == [1, 2, 3, 4])
     }
 }
 
 // MARK: - Edge Cases
 
-extension TreeBinaryNestedBuilderTests.EdgeCase {
+extension `Tree.N<2>.Nested.Builder`.`Edge Case` {
 
     @Test
     func `Conditional child include`() {
@@ -159,7 +159,7 @@ extension TreeBinaryNestedBuilderTests.EdgeCase {
                 }
             }
         }
-        #expect(TreeBinaryNestedBuilderTests.preOrder(tree) == [1, 2, 3])
+        #expect(`Tree.N<2>.Nested.Builder`.preOrder(tree) == [1, 2, 3])
     }
 
     @Test
@@ -174,7 +174,7 @@ extension TreeBinaryNestedBuilderTests.EdgeCase {
             }
         }
         // Without third Node, tree is root + left only
-        #expect(TreeBinaryNestedBuilderTests.preOrder(tree) == [1, 2])
+        #expect(`Tree.N<2>.Nested.Builder`.preOrder(tree) == [1, 2])
     }
 
     @Test
@@ -189,13 +189,13 @@ extension TreeBinaryNestedBuilderTests.EdgeCase {
                 }
             }
         }
-        #expect(TreeBinaryNestedBuilderTests.preOrder(tree) == [1, 10])
+        #expect(`Tree.N<2>.Nested.Builder`.preOrder(tree) == [1, 10])
     }
 }
 
 // MARK: - Depth Coverage (validate recursion)
 
-extension TreeBinaryNestedBuilderTests.DepthCoverage {
+extension `Tree.N<2>.Nested.Builder`.`Depth Coverage` {
 
     @Test
     func `Depth 4 tree`() {
@@ -211,7 +211,7 @@ extension TreeBinaryNestedBuilderTests.DepthCoverage {
             }
         }
         #expect(tree.count == 5)
-        #expect(TreeBinaryNestedBuilderTests.preOrder(tree) == [1, 2, 3, 4, 5])
+        #expect(`Tree.N<2>.Nested.Builder`.preOrder(tree) == [1, 2, 3, 4, 5])
     }
 
     @Test
@@ -229,13 +229,13 @@ extension TreeBinaryNestedBuilderTests.DepthCoverage {
             }
         }
         // In-order traversal of a BST gives sorted output
-        #expect(TreeBinaryNestedBuilderTests.inOrder(tree) == [1, 2, 3, 4, 5, 6, 7])
+        #expect(`Tree.N<2>.Nested.Builder`.inOrder(tree) == [1, 2, 3, 4, 5, 6, 7])
     }
 }
 
 // MARK: - Static Methods
 
-extension TreeBinaryNestedBuilderTests.StaticMethods {
+extension `Tree.N<2>.Nested.Builder`.`Static Methods` {
 
     @Test
     func `buildExpression single Node`() {

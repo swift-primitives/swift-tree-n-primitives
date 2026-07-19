@@ -15,8 +15,8 @@ public import Tree_Primitives
 //
 // The bounded-arity tree's insert position IS the shared
 // ``Tree/Protocol/InsertPosition`` (`__TreeInsertPosition<Address>` with
-// `Address == __TreeNChildSlot<n>`), surfaced per conformer by the
-// `Tree.Protocol` extension. There is no n-ary-specific insert-position type —
+// `Address == __TreeNChildSlot<n>`), surfaced by the carrier's flow-through
+// `InsertPosition` alias. There is no n-ary-specific insert-position type —
 // only the arity-specific convenience factories below, which name child slots
 // positionally and forward to `.child(of:at:)`.
 //

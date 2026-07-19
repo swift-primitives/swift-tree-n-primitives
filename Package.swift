@@ -1,4 +1,4 @@
-// swift-tools-version: 6.3.1
+// swift-tools-version: 6.3.3
 
 import PackageDescription
 
@@ -12,66 +12,56 @@ let package = Package(
         .visionOS(.v26),
     ],
     products: [
-        // MARK: - Type modules (lean ~Copyable types + storage-touching @inlinable ops, co-located per [MOD-036])
-        .library(name: "Tree N Primitive", targets: ["Tree N Primitive"]),
-        // MARK: - Ops modules (isolated Copyable conformances); `Tree N Primitives` doubles as the [MOD-005] umbrella
-        .library(name: "Tree N Primitives", targets: ["Tree N Primitives"]),
-        // MARK: - Test Support
-        .library(name: "Tree N Primitives Test Support", targets: ["Tree N Primitives Test Support"]),
+        .library(
+            name: "Tree N Primitives",
+            targets: ["Tree N Primitives"]
+        ),
+        .library(
+            name: "Tree N Primitives Test Support",
+            targets: ["Tree N Primitives Test Support"]
+        ),
     ],
     dependencies: [
         .package(url: "https://github.com/swift-primitives/swift-tree-primitives.git", branch: "main"),
+        .package(url: "https://github.com/swift-primitives/swift-index-primitives.git", branch: "main"),
         .package(url: "https://github.com/swift-primitives/swift-column-primitives.git", branch: "main"),
         .package(url: "https://github.com/swift-primitives/swift-ownership-shared-primitives.git", branch: "main"),
         .package(url: "https://github.com/swift-primitives/swift-storage-generational-primitives.git", branch: "main"),
         .package(url: "https://github.com/swift-primitives/swift-storage-primitives.git", branch: "main"),
+        .package(url: "https://github.com/swift-primitives/swift-buffer-linear-primitives.git", branch: "main"),
         .package(url: "https://github.com/swift-primitives/swift-buffer-ring-primitives.git", branch: "main"),
         .package(url: "https://github.com/swift-primitives/swift-buffer-primitives.git", branch: "main"),
-        .package(url: "https://github.com/swift-primitives/swift-queue-primitives.git", branch: "main"),
         .package(url: "https://github.com/swift-primitives/swift-stack-primitives.git", branch: "main"),
-        .package(url: "https://github.com/swift-primitives/swift-index-primitives.git", branch: "main"),
-        .package(url: "https://github.com/swift-primitives/swift-array-primitives.git", branch: "main"),
+        .package(url: "https://github.com/swift-primitives/swift-queue-primitives.git", branch: "main"),
         .package(url: "https://github.com/swift-primitives/swift-iterator-primitives.git", branch: "main"),
         .package(url: "https://github.com/swift-primitives/swift-sequence-primitives.git", branch: "main"),
+        .package(url: "https://github.com/swift-primitives/swift-array-primitives.git", branch: "main"),
         // R1 W4: forEach.inOrder fluent accessor via Property<Tag,Base>.Borrow.
         .package(url: "https://github.com/swift-primitives/swift-property-primitives.git", branch: "main"),
     ],
     targets: [
 
-        // MARK: - Type modules
-        // Base bounded-arity Tree.N + Tree.Binary (= Tree.N<2>): the lean
-        // `Tree.Protocol` conformer (sparse `InlineArray<n, Handle?>` child links +
-        // its six link witnesses) over the shared `Tree.Storage` arena, plus the
-        // Order iterators + Order.*.Sequence structs (conformances isolated in the
-        // umbrella) + Copyable/Sendable markers (co-located per [MEM-COPY-006]). The
-        // generational column, decode, and shared ops live in `Tree Primitives`.
+        // MARK: - Tree N (bounded-arity tree discipline; sparse-slot,
+        //         generational-column node storage)
         .target(
-            name: "Tree N Primitive",
+            name: "Tree N Primitives",
             dependencies: [
                 .product(name: "Tree Primitives", package: "swift-tree-primitives"),
+                .product(name: "Index Primitives", package: "swift-index-primitives"),
                 .product(name: "Column Primitives", package: "swift-column-primitives"),
                 .product(name: "Ownership Shared Primitive", package: "swift-ownership-shared-primitives"),
                 .product(name: "Storage Generational Primitives", package: "swift-storage-generational-primitives"),
                 .product(name: "Store Primitive", package: "swift-storage-primitives"),
+                .product(name: "Buffer Linear Primitive", package: "swift-buffer-linear-primitives"),
                 .product(name: "Buffer Ring Primitive", package: "swift-buffer-ring-primitives"),
-                .product(name: "Index Primitives", package: "swift-index-primitives"),
-                .product(name: "Queue Primitives", package: "swift-queue-primitives"),
                 .product(name: "Stack Primitive", package: "swift-stack-primitives"),
                 .product(name: "Stack Primitives", package: "swift-stack-primitives"),
-                .product(name: "Iterator Primitive", package: "swift-iterator-primitives"),
+                .product(name: "Queue Primitives", package: "swift-queue-primitives"),
                 .product(name: "Iterator Protocol", package: "swift-iterator-primitives"),
-                .product(name: "Property Primitives", package: "swift-property-primitives"),
-            ]
-        ),
-        // MARK: - Umbrella: base Swift.Sequence conformances + re-export of the base type.
-        .target(
-            name: "Tree N Primitives",
-            dependencies: [
-                "Tree N Primitive",
-                .product(name: "Iterable", package: "swift-iterator-primitives"),
-                .product(name: "Iterator Primitive", package: "swift-iterator-primitives"),
                 .product(name: "Iterator Chunk Primitives", package: "swift-iterator-primitives"),
-                .product(name: "Sequence Protocol Primitives", package: "swift-sequence-primitives"),
+                .product(name: "Iterable", package: "swift-iterator-primitives"),
+                .product(name: "Sequence Primitives", package: "swift-sequence-primitives"),
+                .product(name: "Property Primitives", package: "swift-property-primitives"),
             ]
         ),
 

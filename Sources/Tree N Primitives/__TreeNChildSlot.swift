@@ -11,14 +11,9 @@
 
 // MARK: - Hoisted ChildSlot Type (Module Level)
 //
-// Swift does not allow nested types with value generic parameters inside
-// generic types to be easily accessed. `ChildSlot` is hoisted to module level
-// and exposed via typealias to provide the expected Nest.Name API.
-//
-// This is a documented exception per [API-EXC-001] due to Swift language
-// limitations with generic nested types containing value generics.
-//
-// Use the typealias form in your code: Tree<Element>.N<n>.ChildSlot
+// The bounded child-slot address of the n-ary column. Hoisted to module level per
+// [API-EXC-001] (a value-generic type cannot nest in the generic carrier) and
+// surfaced via the `Tree<Element>.N<n>.ChildSlot` nest alias on the carrier.
 
 /// Hoisted implementation of ``Tree/N/ChildSlot``.
 ///
@@ -27,9 +22,9 @@
 ///
 /// ## Sparse Slot Semantics
 ///
-/// Per [TREE-003], `Tree<Element>.N<n>` uses sparse child slots. Each node
-/// stores `childIndices[0..<n]` where `-1` denotes empty. Holes are permitted.
-/// This type ensures slot indices are within bounds at construction time.
+/// Per [TREE-003], `Tree<Element>.N<n>` uses sparse child slots: each node stores
+/// `InlineArray<n, Handle?>` where `nil` denotes an empty slot. Holes are
+/// permitted. This type ensures slot indices are within bounds at construction time.
 ///
 /// - Note: Use ``Tree/N/ChildSlot`` in your code, not this type directly.
 public struct __TreeNChildSlot<let n: Int>: Sendable, Equatable, Hashable {

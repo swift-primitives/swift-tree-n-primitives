@@ -9,7 +9,9 @@
 //
 // ===----------------------------------------------------------------------===//
 
-extension Tree.N.Nested where n == 2, Element: Copyable {
+public import Tree_Primitives
+
+extension __TreeNNested {
     /// A result builder for declaratively constructing nested Tree.Binary nodes.
     ///
     /// Used in two roles:
@@ -132,7 +134,7 @@ extension Tree.N.Nested where n == 2, Element: Copyable {
 
 // MARK: - Convenience Init
 
-extension Tree.N where n == 2, Element: Copyable {
+extension __Tree where S: ~Copyable {
     /// Constructs a Tree.Binary from a nested-DSL builder closure.
     ///
     /// The body declares exactly one root `Node`. Each Node may have 0, 1,
@@ -156,15 +158,15 @@ extension Tree.N where n == 2, Element: Copyable {
     ///
     /// - Note: Marked `@_disfavoredOverload` so empty-body call sites
     ///   (`Tree<Int>.N<2> { }`) and Element-literal call sites
-    ///   (`Tree<Int>.N<2> { 1; 2; 3 }`) resolve to the Round-1 flat-BFS
+    ///   (`Tree<Int>.N<2> { 1; 2; 3 }`) resolve to the flat-BFS
     ///   builder. Node-literal call sites
     ///   (`Tree<Int>.N<2> { Node(1) { ... } }`) still resolve here,
-    ///   since the Round-1 builder cannot accept Node expressions.
+    ///   since the flat builder cannot accept Node expressions.
     @inlinable
     @_disfavoredOverload
-    public init(
-        @Tree<Element>.N<2>.Nested.Builder _ builder: () -> [Tree<Element>.N<2>.Nested.Node]
-    ) {
+    public init<Element>(
+        @__TreeNNested<Element>.Builder _ builder: () -> [__TreeNNested<Element>.Node]
+    ) where S == TreeStorage.N<Element, 2> {
         let roots = builder()
         precondition(
             roots.count <= 1,
@@ -181,11 +183,11 @@ extension Tree.N where n == 2, Element: Copyable {
     }
 
     @inlinable
-    static func _insertChildren(
-        _ children: [Tree<Element>.N<2>.Nested.Node],
-        parent: Tree.Position,
-        into tree: inout Tree<Element>.N<2>
-    ) {
+    package static func _insertChildren<Element>(
+        _ children: [__TreeNNested<Element>.Node],
+        parent: __TreePosition,
+        into tree: inout __Tree<TreeStorage.N<Element, 2>>
+    ) where S == TreeStorage.N<Element, 2> {
         if children.count >= 1 {
             let leftNode = children[0]
             // WHY: each `Node` contributes at most one left child, inserted exactly

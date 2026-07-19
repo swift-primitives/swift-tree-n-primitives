@@ -19,22 +19,21 @@ public import Storage_Generational_Primitives
 public import Store_Primitive
 public import Tree_Primitives
 
-// MARK: - Level-Order Iterator
+extension __TreeNOrder.Level {
 
-extension Tree.N.Order.Level {
-
-    /// An iterator for level-order traversal.
-    public struct Iterator: Iterator_Primitive.Iterator.`Protocol` {
+    /// An iterator for level-order (breadth-first) traversal.
+    public struct Iterator<S: __TreeNStorage>: Iterator_Primitive.Iterator.`Protocol`
+    where S.Element: Copyable {
         @usableFromInline
-        let tree: Tree.N<n>
+        let tree: __Tree<S>
 
-        /// The pending-node FIFO on the `Shared` ring column — the CoW flavor is
-        /// required here (not the move-only direct ring) so the iterator struct
-        /// itself stays `Copyable`, preserving its pre-reshape shape.
+        /// The pending-node FIFO on the `Shared` ring column — the CoW flavor keeps the
+        /// iterator struct itself `Copyable`.
         @usableFromInline
         var pending: __Queue<Ownership.Shared<Store.Generational.Handle, Column.Ring<Store.Generational.Handle>>>
 
-        package init(tree: Tree.N<n>) {
+        @usableFromInline
+        init(tree: __Tree<S>) {
             self.tree = tree
             self.pending = __Queue<Ownership.Shared<Store.Generational.Handle, Column.Ring<Store.Generational.Handle>>>()
 
@@ -43,22 +42,19 @@ extension Tree.N.Order.Level {
             }
         }
 
-        /// Advances to the next node in level-order (breadth-first), or returns
-        /// `nil` when traversal is exhausted.
+        /// Advances to the next node in level-order (breadth-first, children in
+        /// slot order), or returns `nil` when traversal is exhausted.
         @inlinable
-        public mutating func next() -> Element? {
+        public mutating func next() -> S.Element? {
             guard let handle = pending.dequeue() else { return nil }
 
-            let element = tree._storage.withElement(at: handle) { $0 }
-            let childHandles = tree._storage.withLinks(at: handle) { $0 }
+            let value = tree._value(of: handle)
 
-            for slot in 0..<n {
-                if let child = childHandles[slot] {
-                    pending.enqueue(child)
-                }
+            for child in tree._childHandles(of: handle) {
+                pending.enqueue(child)
             }
 
-            return element
+            return value
         }
     }
 }

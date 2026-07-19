@@ -9,7 +9,7 @@
 //
 // ===----------------------------------------------------------------------===//
 
-extension Tree.N.Nested where n == 2, Element: Copyable {
+extension __TreeNNested {
     /// A declarative node for the nested-DSL Tree.Binary builder.
     ///
     /// `Node` captures `(element, children)` recursively; the children
@@ -64,7 +64,7 @@ extension Tree.N.Nested where n == 2, Element: Copyable {
         @inlinable
         public init(
             _ element: Element,
-            @Tree<Element>.N<2>.Nested.Builder _ children: () -> [Self]
+            @__TreeNNested<Element>.Builder _ children: () -> [Self]
         ) {
             self.element = element
             self.children = children()

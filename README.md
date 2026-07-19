@@ -102,8 +102,7 @@ The package is pre-1.0 — depend on `branch: "main"` until `0.1.0` is tagged. R
 
 | Product | Contents | When to import |
 |---------|----------|----------------|
-| `Tree N Primitives` | Umbrella — `Tree.N`, `Tree.Binary`, builders, traversal accessors, and the `Sequence`-style iteration conformances | Most consumers |
-| `Tree N Primitive` | The `Tree.N` value type, typed slots, and traversal iterators, without the iteration conformances | Move-only use that must not pull in conformance machinery |
+| `Tree N Primitives` | The bounded-arity storage column, the `Tree<Element>.N<n>` / `Tree<Element>.Binary` front doors, typed slots, builders, traversal accessors, and the iteration conformances | Most consumers |
 | `Tree N Primitives Test Support` | Shared fixtures for testing tree-consuming code | Test targets only |
 
 ---

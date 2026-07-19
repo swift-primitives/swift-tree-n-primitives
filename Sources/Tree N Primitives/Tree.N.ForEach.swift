@@ -11,8 +11,6 @@
 
 public import Property_Primitives
 public import Stack_Primitives
-public import Storage_Generational_Primitives
-public import Store_Primitive
 public import Tree_Primitives
 
 // MARK: - Tree.N forEach.inOrder (binary; R1 W4 [API-NAME-002])
@@ -20,8 +18,9 @@ public import Tree_Primitives
 // The legacy `forEachInOrder` (n == 2) folds into the shared `forEach` view as
 // `tree.forEach.inOrder { }`. Bound to the binary tree-n conformer via
 // `Base.Address == __TreeNChildSlot<2>` — the literal `2` needs no value-generic
-// binding. Inlined over the public arena requirements (the conformer's concrete
-// type is not visible through the protocol-generic view).
+// binding. Walks positions over the `Tree.Protocol` view-facing requirements
+// (`root` / `_child(of:at:)` / `_liveHandle` / `_withElement`) — the conformer's
+// concrete column is not visible through the protocol-generic view.
 
 extension Property_Primitives.Property.Borrow
 where Base: __TreeProtocol & ~Copyable, Tag == __TreeForEach, Base.Address == __TreeNChildSlot<2> {
@@ -30,20 +29,22 @@ where Base: __TreeProtocol & ~Copyable, Tag == __TreeForEach, Base.Address == __
     /// Binary trees only (`Tree.N<2>` / `Tree.Binary`). Iterative (deep-tree safe).
     @inlinable
     public func inOrder(_ body: (borrowing Base.Element) -> Void) {
-        guard let rootHandle = base.value._rootHandle else { return }
-        var pending = Stack<Store.Generational.Handle>()
-        var current: Store.Generational.Handle? = rootHandle
+        guard let root = base.value.root else { return }
+        var pending = Stack<__TreePosition>()
+        var current: __TreePosition? = root
 
         while current != nil || !pending.isEmpty {
             // Walk to the leftmost node.
             while let c = current {
                 pending.push(c)
-                current = base.value._childHandle(at: c, address: .left)
+                current = base.value._child(of: c, at: .left)
             }
             // Visit the node, then move into its right subtree.
             guard let c = pending.pop() else { break }
-            base.value._withElement(at: c) { body($0) }
-            current = base.value._childHandle(at: c, address: .right)
+            if let handle = base.value._liveHandle(c) {
+                base.value._withElement(at: handle) { body($0) }
+            }
+            current = base.value._child(of: c, at: .right)
         }
     }
 }

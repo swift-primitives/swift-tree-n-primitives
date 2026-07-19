@@ -9,9 +9,10 @@
 //
 // ===----------------------------------------------------------------------===//
 
-extension Tree where Element: ~Copyable {
-    /// A binary tree (2-ary tree).
+extension __TreeNOrder {
+
+    /// Namespace for post-order traversal types.
     ///
-    /// This is a typealias for `Tree<Element>.N<2>`.
-    public typealias Binary = Tree.N<2>
+    /// Post-order traversal visits children in slot order, then the root.
+    public enum Post {}
 }

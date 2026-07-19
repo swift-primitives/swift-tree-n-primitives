@@ -9,12 +9,12 @@
 //
 // ===----------------------------------------------------------------------===//
 
-// MARK: - Post-Order Namespace
+extension __TreeNOrder {
 
-extension Tree.N.Order {
-
-    /// Namespace for post-order traversal types.
+    /// Namespace for in-order traversal types.
     ///
-    /// Post-order traversal visits children left-to-right, then the root.
-    public enum Post {}
+    /// In-order traversal visits left subtree, then root, then right subtree.
+    /// Only available for binary trees — its `Iterator` / `Sequence` constrain
+    /// `S.Address == __TreeNChildSlot<2>`.
+    public enum In {}
 }

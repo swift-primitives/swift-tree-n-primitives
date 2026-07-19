@@ -35,8 +35,8 @@ private func expectEqual(_ array: borrowing [Int], _ expected: Int...) {
 
 // MARK: - Tree.N<2> Tests (Binary Trees)
 
-@Suite("Tree.N<2>")
-struct TreeNBinaryTests {
+@Suite
+struct `Tree.N<2>` {
 
     @Test
     func `Empty tree`() {
@@ -262,8 +262,8 @@ struct TreeNBinaryTests {
 
 // MARK: - NonCopyable Tests
 
-@Suite("Tree.N<2>.NonCopyable")
-struct TreeNNonCopyableTests {
+@Suite
+struct `Tree.N<2>.NonCopyable` {
 
     /// A move-only token for testing ~Copyable support.
     struct Token: ~Copyable {
@@ -283,14 +283,6 @@ struct TreeNNonCopyableTests {
     /// Tracks deinit order using Synchronization framework.
     final class DeinitTracker: Sendable {
         private let _order: Mutex<[Int]> = Mutex([])
-
-        func record(_ value: Int) {
-            _order.withLock { $0.append(value) }
-        }
-
-        var order: [Int] {
-            _order.withLock { $0 }
-        }
     }
 
     @Test
@@ -348,10 +340,20 @@ struct TreeNNonCopyableTests {
     }
 }
 
+extension `Tree.N<2>.NonCopyable`.DeinitTracker {
+    func record(_ value: Int) {
+        _order.withLock { $0.append(value) }
+    }
+
+    var order: [Int] {
+        _order.withLock { $0 }
+    }
+}
+
 // MARK: - Conditional Copyable Tests
 
-@Suite("Tree.N<2>.ConditionalCopyable")
-struct TreeNConditionalCopyableTests {
+@Suite
+struct `Tree.N<2>.ConditionalCopyable` {
 
     @Test
     func `Copyable when element is Copyable`() throws {
@@ -384,8 +386,8 @@ struct TreeNConditionalCopyableTests {
 
 // MARK: - Sendable Tests
 
-@Suite("Tree.N<2>.Sendable")
-struct TreeNSendableTests {
+@Suite
+struct `Tree.N<2>.Sendable` {
 
     func requireSendable<T: Sendable & ~Copyable>(_: borrowing T) {}
 
@@ -404,8 +406,8 @@ struct TreeNSendableTests {
 
 // MARK: - Token-Stamped Position Tests
 
-@Suite("Tree.N<2>.StalePosition")
-struct TreeNStalePositionTests {
+@Suite
+struct `Tree.N<2>.StalePosition` {
 
     @Test
     func `Stale position after remove returns nil for navigation`() throws {
