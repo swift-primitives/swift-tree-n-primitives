@@ -104,7 +104,7 @@ extension __TreeNChildSlot where n == 4 {
 // MARK: - CustomStringConvertible
 
 extension __TreeNChildSlot: CustomStringConvertible {
-    /// A textual representation of the slot, e.g. `"ChildSlot(0)"`.
+    /// A textual representation of the slot, such as `"ChildSlot(0)"`.
     public var description: String {
         "ChildSlot(\(index))"
     }
