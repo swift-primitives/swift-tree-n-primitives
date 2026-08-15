@@ -30,12 +30,17 @@ extension __TreeNOrder.Level {
         /// The pending-node FIFO on the `Shared` ring column — the CoW flavor keeps the
         /// iterator struct itself `Copyable`.
         @usableFromInline
-        var pending: __Queue<Ownership.Shared<Store.Generational.Handle, Column.Ring<Store.Generational.Handle>>>
+        var pending:
+            __Queue<
+                Ownership.Shared<Store.Generational.Handle, Column.Ring<Store.Generational.Handle>>
+            >
 
         @usableFromInline
         init(tree: __Tree<S>) {
             self.tree = tree
-            self.pending = __Queue<Ownership.Shared<Store.Generational.Handle, Column.Ring<Store.Generational.Handle>>>()
+            self.pending = __Queue<
+                Ownership.Shared<Store.Generational.Handle, Column.Ring<Store.Generational.Handle>>
+            >()
 
             if let rootHandle = tree._rootHandle {
                 pending.enqueue(rootHandle)

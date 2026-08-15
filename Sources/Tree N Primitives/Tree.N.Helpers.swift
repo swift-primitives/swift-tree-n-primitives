@@ -50,7 +50,8 @@ extension __Tree where S: __TreeNStorage & ~Copyable {
 
     /// A node's occupied child handles, in slot order (left-to-right; holes skipped).
     @inlinable
-    package func _childHandles(of handle: Store.Generational.Handle) -> [Store.Generational.Handle] {
+    package func _childHandles(of handle: Store.Generational.Handle) -> [Store.Generational.Handle]
+    {
         var children: [Store.Generational.Handle] = []
         _storage._forEachChild(at: handle) { children.append($0) }
         return children
