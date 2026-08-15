@@ -379,9 +379,15 @@ struct `Tree Binary Stats Tests` {
         // public type. The public layout facts are the position and the tree handle
         // (a `Shared` CoW box pointer + the root handle — independent of arity and
         // element, which live in the arena).
-        print("Tree<Int>.Position: size=\(MemoryLayout<Tree<Int>.Position>.size) stride=\(MemoryLayout<Tree<Int>.Position>.stride) align=\(MemoryLayout<Tree<Int>.Position>.alignment)")
-        print("Tree<Int>.N<2> (handle): size=\(MemoryLayout<Tree<Int>.N<2>>.size) stride=\(MemoryLayout<Tree<Int>.N<2>>.stride)")
-        print("Store.Generational.Handle: size=\(MemoryLayout<Store.Generational.Handle>.size) stride=\(MemoryLayout<Store.Generational.Handle>.stride)")
+        print(
+            "Tree<Int>.Position: size=\(MemoryLayout<Tree<Int>.Position>.size) stride=\(MemoryLayout<Tree<Int>.Position>.stride) align=\(MemoryLayout<Tree<Int>.Position>.alignment)"
+        )
+        print(
+            "Tree<Int>.N<2> (handle): size=\(MemoryLayout<Tree<Int>.N<2>>.size) stride=\(MemoryLayout<Tree<Int>.N<2>>.stride)"
+        )
+        print(
+            "Store.Generational.Handle: size=\(MemoryLayout<Store.Generational.Handle>.size) stride=\(MemoryLayout<Store.Generational.Handle>.stride)"
+        )
 
         // Column overhead post-Round-M: the generational column's fused parity-token
         // ledger (ONE Int plane: token = generation<<1 | occupied) and NO tree-side
@@ -406,11 +412,9 @@ struct `Tree Binary Stats Tests` {
     //        func logArenaState(_ tree: Tree<Int>.N<2>, label: Int) {
     //            let h = tree._arena.header
     //            (dead/disabled debug code below — inert text, not compiled)
-    //            swiftlint:disable no_int_bitpattern_arithmetic
     //            let occ = Int(bitPattern: h.occupied)
     //            let hw = Int(bitPattern: h.highWater)
     //            let cap = Int(bitPattern: h.capacity)
-    //            swiftlint:enable no_int_bitpattern_arithmetic
     //            let freeCount = hw - occ
     //            let util = cap > 0 ? String(format: "%.1f%%", Double(occ) / Double(cap) * 100) : "n/a"
     //            print(String(format: "%5d | %8d | %9d | %8d | %9d | %@", label, occ, hw, cap, freeCount, util))
