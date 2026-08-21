@@ -78,7 +78,7 @@ let package = Package(
             url: "https://github.com/swift-primitives/swift-array-primitives.git",
             branch: "main"
         ),
-        // R1 W4: forEach.inOrder fluent accessor via Property<Tag,Base>.Borrow.
+
         .package(
             url: "https://github.com/swift-primitives/swift-property-primitives.git",
             branch: "main"
@@ -86,8 +86,6 @@ let package = Package(
     ],
     targets: [
 
-        // MARK: - Tree N (bounded-arity tree discipline; sparse-slot,
-        //         generational-column node storage)
         .target(
             name: "Tree N Primitives",
             dependencies: [
@@ -119,7 +117,6 @@ let package = Package(
             ]
         ),
 
-        // MARK: - Test Support ([MOD-024] spine)
         .target(
             name: "Tree N Primitives Test Support",
             dependencies: [
@@ -129,7 +126,6 @@ let package = Package(
             path: "Tests/Support"
         ),
 
-        // MARK: - Tests
         .testTarget(
             name: "Tree N Primitives Tests",
             dependencies: [

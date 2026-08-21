@@ -1,14 +1,3 @@
-// ===----------------------------------------------------------------------===//
-//
-// This source file is part of the swift-primitives open source project
-//
-// Copyright (c) 2024-2026 Coen ten Thije Boonkkamp and the swift-primitives project authors
-// Licensed under Apache License v2.0
-//
-// See LICENSE for license information
-//
-// ===----------------------------------------------------------------------===//
-
 import Array_Primitives
 import Sequence_Primitives
 import Synchronization
@@ -17,9 +6,6 @@ import Tree_N_Primitives_Test_Support
 
 @testable import Tree_N_Primitives
 
-// MARK: - Test Helpers
-
-/// Asserts that a primitives Array contains the expected elements in order.
 private func expectEqual(_ array: borrowing [Int], _ expected: Int...) {
     var index = 0
     array.forEach { element in
@@ -32,8 +18,6 @@ private func expectEqual(_ array: borrowing [Int], _ expected: Int...) {
     }
     #expect(index == expected.count, "Array has \(index) elements, expected \(expected.count)")
 }
-
-// MARK: - Tree.N<2> Tests (Binary Trees)
 
 @Suite
 struct `Tree.N<2>` {
@@ -83,8 +67,6 @@ struct `Tree.N<2>` {
         var tree = Tree<Int>.N<2>()
         _ = try tree.insert(1, at: .root)
 
-        // Root-occupied now refines to `.rootOccupied` (the shared insert default),
-        // distinct from a child `.slotOccupied` (W1-flagged refinement).
         #expect(throws: __TreeError.rootOccupied) {
             try tree.insert(2, at: .root)
         }
@@ -243,7 +225,6 @@ struct `Tree.N<2>` {
     func `Capacity growth`() throws {
         var tree = Tree<Int>.N<2>()
 
-        // Build a complete binary tree with 15 nodes
         var positions: [Tree<Int>.Position] = []
         positions.append(try tree.insert(1, at: .root))
 
@@ -260,12 +241,9 @@ struct `Tree.N<2>` {
     }
 }
 
-// MARK: - NonCopyable Tests
-
 @Suite
 struct `Tree.N<2>.NonCopyable` {
 
-    /// A move-only token for testing ~Copyable support.
     struct Token: ~Copyable {
         let value: Int
         let tracker: DeinitTracker
@@ -280,7 +258,6 @@ struct `Tree.N<2>.NonCopyable` {
         }
     }
 
-    /// Tracks deinit order using Synchronization framework.
     final class DeinitTracker: Sendable {
         private let _order: Mutex<[Int]> = Mutex([])
     }
@@ -313,13 +290,6 @@ struct `Tree.N<2>.NonCopyable` {
             _ = try tree.insert(Token(5, tracker: tracker), at: .right(of: left))
         }
 
-        // Column teardown (the Shared box's drain -> removeAll) frees in SLOT
-        // order, not tree order. Tree.N is conditionally Copyable, so it cannot
-        // have a custom deinit. Slot assignment is the pool's: fresh slots hand
-        // out densely until full, and since Round M A4 (descending release in
-        // grow(to:)) post-growth hand-out is ALSO ascending — fresh-pool parity.
-        // Capacity doubles from 1: 1->slot0; 2->slot1; grow(4) -> 3->slot2,
-        // 4->slot3; grow(8) -> 5->slot4. Slot order == insertion order here.
         #expect(tracker.order == [1, 2, 3, 4, 5])
     }
 
@@ -350,8 +320,6 @@ extension `Tree.N<2>.NonCopyable`.DeinitTracker {
     }
 }
 
-// MARK: - Conditional Copyable Tests
-
 @Suite
 struct `Tree.N<2>.ConditionalCopyable` {
 
@@ -361,7 +329,6 @@ struct `Tree.N<2>.ConditionalCopyable` {
         let root = try tree1.insert(1, at: .root)
         _ = try tree1.insert(2, at: .left(of: root))
 
-        // This should compile - tree is Copyable
         let tree2 = tree1
 
         #expect(tree1.count == tree2.count)
@@ -375,16 +342,12 @@ struct `Tree.N<2>.ConditionalCopyable` {
 
         var tree2 = tree1
 
-        // Mutate tree2
         _ = try tree2.insert(3, at: .right(of: tree2.root!))
 
-        // tree1 should be unchanged
         #expect(tree1.count == 2)
         #expect(tree2.count == 3)
     }
 }
-
-// MARK: - Sendable Tests
 
 @Suite
 struct `Tree.N<2>.Sendable` {
@@ -397,14 +360,10 @@ struct `Tree.N<2>.Sendable` {
         let root = try tree.insert(42, at: .root)
         _ = try tree.insert(1, at: .left(of: root))
 
-        // Proper conditional Sendable (no `@unchecked`/`@unsafe`): the call needs no
-        // `unsafe` marker.
         requireSendable(tree)
     }
 
 }
-
-// MARK: - Token-Stamped Position Tests
 
 @Suite
 struct `Tree.N<2>.StalePosition` {
@@ -416,10 +375,8 @@ struct `Tree.N<2>.StalePosition` {
         let left = try tree.insert(2, at: .left(of: root))
         _ = try tree.insert(3, at: .right(of: root))
 
-        // Remove the left node
         _ = try tree.remove(at: left)
 
-        // The stale position should return nil for navigation
         #expect(tree.left(of: left) == nil)
         #expect(tree.right(of: left) == nil)
         #expect(tree.parent(of: left) == nil)
@@ -434,10 +391,8 @@ struct `Tree.N<2>.StalePosition` {
         let left = try tree.insert(2, at: .left(of: root))
         _ = try tree.insert(3, at: .right(of: root))
 
-        // Remove the left node
         _ = try tree.remove(at: left)
 
-        // Inserting at a stale position should throw
         #expect(throws: __TreeError.invalidPosition) {
             try tree.insert(4, at: .left(of: left))
         }
@@ -452,15 +407,12 @@ struct `Tree.N<2>.StalePosition` {
         let root = try tree.insert(1, at: .root)
         let left = try tree.insert(2, at: .left(of: root))
 
-        // Capture position before more inserts
         let leftPosition = left
 
-        // Insert more nodes elsewhere
         _ = try tree.insert(3, at: .right(of: root))
         _ = try tree.insert(4, at: .left(of: left))
         _ = try tree.insert(5, at: .right(of: left))
 
-        // Original position should still be valid
         #expect(tree.peek(at: leftPosition) == 2)
         #expect(tree.parent(of: leftPosition) == root)
         #expect(tree.left(of: leftPosition) != nil)
@@ -476,11 +428,9 @@ struct `Tree.N<2>.StalePosition` {
         let leftLeft = try tree.insert(4, at: .left(of: left))
         _ = try tree.insert(5, at: .right(of: left))
 
-        // Remove unrelated nodes
         _ = try tree.remove(at: right)
         _ = try tree.remove(at: leftLeft)
 
-        // Left position should still be valid
         #expect(tree.peek(at: left) == 2)
         #expect(tree.parent(of: left) == root)
     }
@@ -491,17 +441,13 @@ struct `Tree.N<2>.StalePosition` {
         let root = try tree1.insert(1, at: .root)
         let left = try tree1.insert(2, at: .left(of: root))
 
-        // Copy (shared storage)
         var tree2 = tree1
 
-        // Mutate tree2 (triggers CoW)
         _ = try tree2.insert(3, at: .right(of: tree2.root!))
 
-        // Position from tree1 should still work with tree1
         #expect(tree1.peek(at: root) == 1)
         #expect(tree1.peek(at: left) == 2)
 
-        // tree2's root should still be valid
         #expect(tree2.peek(at: tree2.root!) == 1)
     }
 
@@ -509,11 +455,9 @@ struct `Tree.N<2>.StalePosition` {
     func `Position survives growth reallocation`() throws {
         var tree = Tree<Int>.N<2>()
 
-        // Build tree and capture positions
         let root = try tree.insert(1, at: .root)
         var positions: [Tree<Int>.Position] = [root]
 
-        // Force multiple growths
         for i in 0..<20 {
             let parent = positions[i / 2]
             if i % 2 == 0 && tree.left(of: parent) == nil {
@@ -523,7 +467,6 @@ struct `Tree.N<2>.StalePosition` {
             }
         }
 
-        // All original positions should still be valid
         #expect(tree.peek(at: root) == 1)
         #expect(tree.peek(at: positions[1]) != nil)
     }
@@ -534,19 +477,14 @@ struct `Tree.N<2>.StalePosition` {
         let root = try tree.insert(1, at: .root)
         let left = try tree.insert(2, at: .left(of: root))
 
-        // Remove left
         _ = try tree.remove(at: left)
 
-        // Insert new node - may reuse the slot
         let newLeft = try tree.insert(3, at: .left(of: root))
 
-        // Old position should be invalid (different token)
         #expect(tree.peek(at: left) == nil)
 
-        // New position should be valid
         #expect(tree.peek(at: newLeft) == 3)
 
-        // They may have the same index but different tokens
         #expect(left != newLeft)
     }
 }

@@ -1,14 +1,3 @@
-// ===----------------------------------------------------------------------===//
-//
-// This source file is part of the swift-primitives open source project
-//
-// Copyright (c) 2024-2026 Coen ten Thije Boonkkamp and the swift-primitives project authors
-// Licensed under Apache License v2.0
-//
-// See LICENSE for license information
-//
-// ===----------------------------------------------------------------------===//
-
 internal import Iterator_Primitive
 internal import Iterator_Protocol
 public import Stack_Primitive
@@ -19,12 +8,6 @@ public import Tree_Primitives
 
 extension __TreeNOrder.Pre {
 
-    /// An iterator for pre-order traversal (root, then children in slot order).
-    ///
-    /// Move-only (`~Copyable`): the traversal scratch is the canonical direct
-    /// `Stack<Handle>`, which is move-only regardless of element (the W2 stack reshape);
-    /// the whole `Iterator.Protocol` / `Iterable` / `Materializing` machinery suppresses
-    /// `~Copyable`, so the iterator rides it without a CoW column (seat D3 ruling (a)).
     public struct Iterator<S: __TreeNStorage>: ~Copyable, Iterator_Primitive.Iterator.`Protocol`
     where S.Element: Copyable {
         @usableFromInline
@@ -42,15 +25,12 @@ extension __TreeNOrder.Pre {
             }
         }
 
-        /// Advances to the next node in pre-order (parent before children, children
-        /// in slot order), or returns `nil` when traversal is exhausted.
         @inlinable
         public mutating func next() -> S.Element? {
             guard let handle = pending.pop() else { return nil }
 
             let value = tree._value(of: handle)
 
-            // Collect children, push in reverse for correct order
             let children = tree._childHandles(of: handle)
             for i in (0..<children.count).reversed() {
                 pending.push(children[i])
